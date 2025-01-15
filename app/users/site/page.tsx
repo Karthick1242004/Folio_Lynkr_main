@@ -15,7 +15,7 @@ export default function Page() {
         <h1 className="text-[32px] font-bold text-gray-900">
           {site.title}
         </h1>
-        <p className="text-[14px] text-gray-400 max-w-[50%]">
+        <p className="text-[14px] text-gray-400 max-w-[50%] max500:max-w-[100%]">
           {site.description}
         </p>
         <div className="flex items-center justify-between pt-2 max500:flex-col max500:gap-2 max500:items-start">
