@@ -18,7 +18,7 @@ export default function Page() {
         <p className="text-[14px] text-gray-400 max-w-[50%]">
           {site.description}
         </p>
-        <div className="flex items-center justify-between pt-2 flex-wrap">
+        <div className="flex items-center justify-between pt-2 max500:flex-col max500:gap-2 max500:items-start">
           <div className="flex items-center gap-[1px]">
             <Link
               href="#"
@@ -34,7 +34,7 @@ export default function Page() {
               Price: <span className="font-extrabold text-[16px]">₹{site.amount}</span>
             </Link>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             <button 
               className={`inline-flex items-center gap-1.5 text-sm border border-gray-200 px-3 py-1.5 rounded-full transition-colors ${
                 isLiked ? 'bg-red-500 text-white ' : 'hover:bg-gray-100'
