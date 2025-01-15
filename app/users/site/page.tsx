@@ -3,13 +3,14 @@ import Link from "next/link"
 import { Heart } from 'lucide-react'
 import { useState } from "react"
 import siteData from '@/Data/data.json'
+import Image from "next/image"
 
 export default function Page() {
   const [isLiked, setIsLiked] = useState(false)
   const { site } = siteData
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-12">
+    <div className="max-w-4xl mx-auto px-4 mt-[4%]">
       <div className="space-y-1">
         <h1 className="text-[32px] font-bold text-gray-900">
           {site.title}
@@ -23,20 +24,14 @@ export default function Page() {
               href="#"
               className="inline-flex items-center gap-2 text-sm bg-black/5 hover:bg-black/10 px-3 py-1.5 rounded-l-full transition-colors"
             >
-              <svg
-                viewBox="0 0 16 16"
-                className="w-4 h-4"
-                fill="currentColor"
-              >
-                <path d="M8 0L9.99182 1.3121L12.3696 1.29622L13.3431 3.48797L15.3519 4.77336L14.9979 7.14888L16 9.32001L14.4005 11.1777L14.0691 13.5578L11.8437 14.1426L10.2264 16L8 15.308L5.77361 16L4.15632 14.1426L1.93092 13.5578L1.59948 11.1777L0 9.32001L1.00206 7.14888L0.648112 4.77336L2.65693 3.48797L3.63039 1.29622L6.00818 1.3121L8 0Z" />
-              </svg>
-              Built with {site.builtWith}
+              <Image src="/next-js.svg" alt="Next.js" width={16} height={16} />
+              Built with <span className="font-semibold">{site.builtWith}</span>
             </Link>
             <Link
               href="#"
               className="inline-flex items-center gap-2 text-sm bg-black/5 hover:bg-black/10 px-3 py-1.5 rounded-r-full transition-colors"
             >
-              {site.signUpText}
+              Price: <span className="font-extrabold text-[16px]">₹{site.amount}</span>
             </Link>
           </div>
           <div className="flex items-center gap-2">
@@ -47,7 +42,7 @@ export default function Page() {
               onClick={()=>setIsLiked(!isLiked)}
             >
               <Heart className={`w-4 h-4 ${isLiked ? 'fill-white' : ''}`} />
-              Like {isLiked ? 1 : 0}
+              {isLiked ? 'Liked' : 'Like'} {isLiked ? 1 : null}
             </button>
             <Link
               href="#"
@@ -67,7 +62,22 @@ export default function Page() {
           </div>
         </div>
         <div>
-          <img className="rounded-[10px] overflow-hidden mt-4" src={site.imageUrl} alt={site.title} />
+          <img className="rounded-[10px] overflow-hidden mt-4 pb-1" src={site.imageUrl} alt={site.title} />
+        </div>
+        <div className=" flex items-center max400:flex-col gap-4 border border-blue-100 bg-blue-50 p-4 rounded-[10px]">
+          <svg
+            className="w-5 h-5 text-blue-500 flex-shrink-0"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          >
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
+          </svg>
+          <p className="text-sm text-blue-700 flex-1">
+            Make this site yours by filling out the form. Press the button to start filling out the form, once you have filled out the form, provide your desired domain name in the provided field.
+          </p>
+          <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full text-sm whitespace-nowrap transition-colors">
+            Make it yours
+          </button>
         </div>
       </div>
     </div>

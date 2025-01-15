@@ -29,7 +29,7 @@ export const Navigation: React.FC<NavigationProps> = ({ isOpen, onClose }) => {
           <a
             key={item.text}
             href="#"
-            className={`text-4xl font-big-shoulders font-bold ${
+            className={`text-4xl name-text !tracking-normal font-bold ${
               item.isHighlight
                 ? 'text-[#ffffff] dark:text-[#E0F01F]'
                 : 'text-black dark:text-white'

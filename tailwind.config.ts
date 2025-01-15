@@ -79,7 +79,16 @@ const config: Config = {
   		},
   		max500: {
   			max: '500px'
-  		}
+  		},
+  		max700: {
+  			max: '700px'
+  		},
+  		max800: {
+  			max: '800px'
+  		},
+		max400: {
+			max: '400px'
+		}
   	}
   },
   plugins: [require("tailwindcss-animate")],

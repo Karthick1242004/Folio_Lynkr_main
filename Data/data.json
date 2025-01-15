@@ -2,8 +2,8 @@
   "site": {
     "title": "Designjoy",
     "description": "The #1 design subscription service for agencies, startups, and entrepreneurs.",
-    "builtWith": "Framer",
-    "signUpText": "Sign up now for Free",
+    "builtWith": "Next JS",
+    "amount": "500",
     "imageUrl": "https://framerusercontent.com/images/6TnzYAxnJHE8dZKdEzAhenP4pTg.webp"
   }
 }
