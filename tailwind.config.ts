@@ -80,6 +80,9 @@ const config: Config = {
   		max500: {
   			max: '500px'
   		},
+  		max600: {
+  			max: '600px'
+  		},
   		max700: {
   			max: '700px'
   		},

@@ -4,6 +4,7 @@
     "description": "The #1 design subscription service for agencies, startups, and entrepreneurs.",
     "builtWith": "Next JS",
     "amount": "500",
-    "imageUrl": "https://framerusercontent.com/images/6TnzYAxnJHE8dZKdEzAhenP4pTg.webp"
+    "imageUrl": "/bentofolio.png",
+    "visitUrl": "https://kanisha.vercel.app/"
   }
 }
