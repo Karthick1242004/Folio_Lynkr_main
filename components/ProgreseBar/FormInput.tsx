@@ -1,17 +1,42 @@
-interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-    label: string;
-  }
-  
-  export function FormInput({ label, ...props }: FormInputProps) {
-    return (
-      <div className="space-y-2">
-        <label className="block text-[#1A1E3C] font-medium">{label}</label>
-        <input
-          {...props}
-          className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-[#574EFA] focus:ring-2 focus:ring-[#574EFA]/20 outline-none transition-all placeholder:text-gray-400"
-        />
-      </div>
-    );
-  }
+interface FormInputProps {
+  type?: 'text' | 'email' | 'url' | 'textarea';
+  name: string;
+  label: string;
+  value?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  placeholder?: string;
+  id?: string;
+  rows?: number;
+}
+
+export const FormInput: React.FC<FormInputProps> = ({ 
+  type = 'text', 
+  name, 
+  label, 
+  value, 
+  onChange, 
+  placeholder,
+  rows = 3
+}) => {
+  return type === 'textarea' ? (
+    <textarea
+      name={name}
+      value={value}
+      onChange={onChange}
+      placeholder={placeholder}
+      rows={rows}
+      className="w-full px-3 py-2 border rounded-lg"
+    />
+  ) : (
+    <input
+      type={type}
+      name={name}
+      value={value}
+      onChange={onChange}
+      placeholder={placeholder}
+      className="w-full px-3 py-2 border rounded-lg"
+    />
+  );
+};
   
   

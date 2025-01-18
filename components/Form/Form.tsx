@@ -5,11 +5,56 @@ import axios from 'axios';
 import ProgressBar from '@/components/ProgreseBar/ProgreseBar';
 import { FormInput } from '@/components/ProgreseBar/FormInput';
 
+// Define types for the nested form data structure
+interface FormDataType {
+  siteTitle: string;
+  subdomain: string;
+  socialLinks: {
+    github: string;
+    linkedin: string;
+    leetcode: string;
+  };
+  hero: {
+    profileImage: string;
+    name: string;
+    title: string;
+    description: string;
+    featuredImage: string;
+  };
+  services: Array<{
+    title: string;
+    description: string;
+  }>;
+  testimonials: Array<{
+    quote: string;
+    author: {
+      name: string;
+      title: string;
+      image: string;
+    };
+    image: string;
+  }>;
+  footer: {
+    contact: {
+      title: string;
+      subtitle: string;
+      email: string;
+    };
+    academic: {
+      title: string;
+      qualifications: Array<{
+        name: string;
+        href: string;
+      }>;
+    };
+  };
+}
+
 function Form() {
   const { subdomain, availability, loading, setSubdomain, setAvailability, setLoading } = useStore();
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 7;
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormDataType>({
     siteTitle: '',
     subdomain: '',
     socialLinks: {
@@ -46,20 +91,18 @@ function Form() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => {
-      // Handle nested objects
       const keys = name.split('.');
       if (keys.length === 1) {
         return { ...prev, [name]: value };
       }
       
-      // Handle nested properties
-      let current = { ...prev };
-      let temp = current;
+      const newFormData = { ...prev };
+      let current: any = newFormData;
       for (let i = 0; i < keys.length - 1; i++) {
-        temp = temp[keys[i]];
+        current = current[keys[i]];
       }
-      temp[keys[keys.length - 1]] = value;
-      return current;
+      current[keys[keys.length - 1]] = value;
+      return newFormData;
     });
   };
 
