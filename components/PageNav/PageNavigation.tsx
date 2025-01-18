@@ -1,11 +1,10 @@
 import React from 'react';
 import { X } from 'lucide-react';
 import { RiMenu2Line } from 'react-icons/ri';
-import Image from 'next/image';
 import { ThemeToggle } from '../ThemeToggle';
 import { useStore } from '@/store/store';
-import Darklogo from "../../assets/33.png";
-import Lightlogo from "../../assets/44.png";
+import Link from 'next/link';
+
 
 interface NavigationProps {
   isOpen: boolean;
@@ -16,18 +15,18 @@ export const PageNavigation: React.FC<NavigationProps> = ({ isOpen, onClose }) =
   const { isDark, toggleTheme, setIsNavOpen } = useStore();
   
   const menuItems = [
-    { text: 'HOME', isHighlight: true },
-    { text: 'ABOUT', isHighlight: false },
-    { text: 'PROJECTS', isHighlight: false },
-    { text: 'EXPERIENCE', isHighlight: false },
-    { text: 'CONTACT', isHighlight: false },
+    { text: 'HOME', isHighlight: true,link:'/' },
+    { text: 'ABOUT', isHighlight: false,link:'/' },
+    { text: 'PROJECTS', isHighlight: false,link:'/' },
+    { text: 'EXPERIENCE', isHighlight: false,link:'/' },
+    { text: 'CONTACT', isHighlight: false,link:'/' },
   ];
 
   return (
     <>
-      <header className="flex justify-between items-center sm:mb-header-spacing max-w-4xl mx-auto pt-3 px-3 max500:mt-4">
+      <header className="flex justify-between items-center sm:mb-header-spacing max-w-4xl mx-auto pt-3 px-3 max500:pt-5">
         <button className="p-1 sm:p-2" onClick={() => setIsNavOpen(true)} title="Menu">
-          <RiMenu2Line size={38} color={isDark ? "#9CA3AF" : "#9CA3AF"} />
+          <RiMenu2Line size={window.innerWidth <= 500 ? 30 : 38} color={isDark ? "#9CA3AF" : "#9CA3AF"} />
         </button>
         <div className="flex items-center gap-2 sm:gap-4">
           <ThemeToggle isDark={isDark} onToggle={toggleTheme} />
@@ -44,20 +43,17 @@ export const PageNavigation: React.FC<NavigationProps> = ({ isOpen, onClose }) =
         </div>
         <nav className="flex flex-col items-start px-8 sm:px-16 pt-8 sm:pt-12 space-y-4">
           {menuItems.map((item) => (
-            <a
+            <Link
               key={item.text}
-              href="#"
-              className={`text-4xl name-text !tracking-normal font-bold ${
-                item.isHighlight
-                  ? 'text-[#ffffff] dark:text-[#E0F01F]'
-                  : 'text-black dark:text-white'
-              } hover:text-[#ffffff] dark:hover:text-[#E0F01F] transition-colors`}
+              href={item.link}
+              className="text-4xl name-text !tracking-normal font-bold text-white hover:text-[#E0F01F] transition-colors"
             >
               {item.text}
-            </a>
+            </Link>
           ))}
         </nav>
       </div>
     </>
   );
 };
+  

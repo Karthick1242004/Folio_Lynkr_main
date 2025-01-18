@@ -1,10 +1,67 @@
 "use client"
+import React, { useState, FormEvent } from 'react';
 import { useStore } from '@/store/store';
-import { FormEvent } from 'react';
 import axios from 'axios';
+import ProgressBar from '@/components/ProgreseBar/ProgreseBar';
+import { FormInput } from '@/components/ProgreseBar/FormInput';
 
 function Form() {
   const { subdomain, availability, loading, setSubdomain, setAvailability, setLoading } = useStore();
+  const [currentStep, setCurrentStep] = useState(1);
+  const totalSteps = 7;
+  const [formData, setFormData] = useState({
+    siteTitle: '',
+    subdomain: '',
+    socialLinks: {
+      github: '',
+      linkedin: '',
+      leetcode: '',
+    },
+    hero: {
+      profileImage: '',
+      name: '',
+      title: '',
+      description: '',
+      featuredImage: '',
+    },
+    services: Array(3).fill({ title: '', description: '' }),
+    testimonials: Array(3).fill({
+      quote: '',
+      author: { name: '', title: '', image: '' },
+      image: '',
+    }),
+    footer: {
+      contact: {
+        title: '',
+        subtitle: '',
+        email: '',
+      },
+      academic: {
+        title: '',
+        qualifications: Array(3).fill({ name: '', href: '' }),
+      },
+    },
+  });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => {
+      // Handle nested objects
+      const keys = name.split('.');
+      if (keys.length === 1) {
+        return { ...prev, [name]: value };
+      }
+      
+      // Handle nested properties
+      let current = { ...prev };
+      let temp = current;
+      for (let i = 0; i < keys.length - 1; i++) {
+        temp = temp[keys[i]];
+      }
+      temp[keys[keys.length - 1]] = value;
+      return current;
+    });
+  };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -30,49 +87,19 @@ function Form() {
         description: formData.get("description") as string,
         featuredImage: formData.get("featuredImage") as string,
       },
-      services: [
-        {
-          title: formData.get("service1Title") as string,
-          description: formData.get("service1Description") as string,
+      services: [1, 2, 3].map(index => ({
+        title: formData.get(`service${index}Title`) as string,
+        description: formData.get(`service${index}Description`) as string,
+      })),
+      testimonials: [1, 2, 3].map(index => ({
+        quote: formData.get(`testimonial${index}Quote`) as string,
+        author: {
+          name: formData.get(`testimonial${index}AuthorName`) as string,
+          title: formData.get(`testimonial${index}AuthorTitle`) as string,
+          image: formData.get(`testimonial${index}AuthorImage`) as string,
         },
-        {
-          title: formData.get("service2Title") as string,
-          description: formData.get("service2Description") as string,
-        },
-        {
-          title: formData.get("service3Title") as string,
-          description: formData.get("service3Description") as string,
-        },
-      ],
-      testimonials: [
-        {
-          quote: formData.get("testimonial1Quote") as string,
-          author: {
-            name: formData.get("testimonial1AuthorName") as string,
-            title: formData.get("testimonial1AuthorTitle") as string,
-            image: formData.get("testimonial1AuthorImage") as string,
-          },
-          image: formData.get("testimonial1Image") as string,
-        },
-        {
-          quote: formData.get("testimonial2Quote") as string,
-          author: {
-            name: formData.get("testimonial2AuthorName") as string,
-            title: formData.get("testimonial2AuthorTitle") as string,
-            image: formData.get("testimonial2AuthorImage") as string,
-          },
-          image: formData.get("testimonial2Image") as string,
-        },
-        {
-          quote: formData.get("testimonial3Quote") as string,
-          author: {
-            name: formData.get("testimonial3AuthorName") as string,
-            title: formData.get("testimonial3AuthorTitle") as string,
-            image: formData.get("testimonial3AuthorImage") as string,
-          },
-          image: formData.get("testimonial3Image") as string,
-        },
-      ],
+        image: formData.get(`testimonial${index}Image`) as string,
+      })),
       footer: {
         contact: {
           title: formData.get("contactTitle") as string,
@@ -81,20 +108,10 @@ function Form() {
         },
         academic: {
           title: formData.get("academicTitle") as string,
-          qualifications: [
-            {
-              name: formData.get("qualification1") as string,
-              href: formData.get("qualification1Href") as string,
-            },
-            {
-              name: formData.get("qualification2") as string,
-              href: formData.get("qualification2Href") as string,
-            },
-            {
-              name: formData.get("qualification3") as string,
-              href: formData.get("qualification3Href") as string,
-            },
-          ],
+          qualifications: [1, 2, 3].map(index => ({
+            name: formData.get(`qualification${index}`) as string,
+            href: formData.get(`qualification${index}Href`) as string,
+          })),
         },
       },
     };
@@ -124,7 +141,7 @@ function Form() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ gistRawUrl, subdomain }), // Include subdomain here
+        body: JSON.stringify({ gistRawUrl, subdomain }),
       });
 
       if (!updateGistUrlResponse.ok) {
@@ -167,214 +184,365 @@ function Form() {
     }
   };
 
-  return (
-    <>
-      <div>
-        <input
-          type="text"
-          value={subdomain}
-          onChange={(e) => setSubdomain(e.target.value)}
-          placeholder="Enter subdomain"
-        />
-        <button onClick={checkAvailability} disabled={loading}>
-          {loading ? 'Checking...' : 'Check Availability'}
-        </button>
-        {availability && <p>{availability}</p>}
-      </div>
-      <div className="container mx-auto p-4 ">
-        <h1 className="text-2xl font-bold mb-4">Portfolio Details Form</h1>
+  const nextStep = () => {
+    setCurrentStep((prev) => Math.min(prev + 1, totalSteps));
+  };
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Site Details */}
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold">Site Details</h2>
-            <input
-              type="text"
+  const prevStep = () => {
+    setCurrentStep((prev) => Math.max(prev - 1, 1));
+  };
+
+  const renderStep = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          <div className="space-y-6">
+            <FormInput
+              label="Site Title"
               name="siteTitle"
-              placeholder="Site Title"
-              className="w-full p-2 border rounded"
+              value={formData.siteTitle}
+              onChange={handleInputChange}
+              placeholder="Enter your site title"
+              type="text"
             />
+            <div className="space-y-2">
+              <FormInput
+                label="Subdomain"
+                name="subdomain"
+                value={subdomain}
+                onChange={(e) => setSubdomain(e.target.value)}
+                placeholder="Enter subdomain"
+                type="text"
+              />
+              <button
+                onClick={checkAvailability}
+                disabled={loading}
+                className="w-full mt-2 px-6 py-3 bg-[#574EFA] text-white rounded-lg hover:bg-[#4A3FF7] disabled:bg-gray-300 transition-colors"
+                type="button"
+              >
+                {loading ? 'Checking...' : 'Check Availability'}
+              </button>
+              {availability && (
+                <p className="mt-2 text-sm text-gray-600">{availability}</p>
+              )}
+            </div>
           </div>
-
-          {/* Social Links */}
+        );
+      case 2:
+        return (
           <div className="space-y-4">
             <h2 className="text-xl font-semibold">Social Links</h2>
-            <input
-              type="url"
-              name="github"
-              placeholder="GitHub URL"
-              className="w-full p-2 border rounded"
+            <FormInput 
+              type="url" 
+              name="socialLinks.github" 
+              label="GitHub URL"
+              id="github"
+              key="github"
+              value={formData.socialLinks.github}
+              onChange={handleInputChange}
+              placeholder="Enter your GitHub profile URL" 
             />
-            <input
-              type="url"
-              name="linkedin"
-              placeholder="LinkedIn URL"
-              className="w-full p-2 border rounded"
+            <FormInput 
+              type="url" 
+              name="socialLinks.linkedin"
+              label="LinkedIn URL"
+              id="linkedin"
+              key="linkedin"
+              value={formData.socialLinks.linkedin}
+              onChange={handleInputChange}
+              placeholder="Enter your LinkedIn profile URL" 
             />
-            <input
-              type="url"
-              name="leetcode"
-              placeholder="LeetCode URL"
-              className="w-full p-2 border rounded"
+            <FormInput 
+              type="url" 
+              name="socialLinks.leetcode"
+              label="LeetCode URL"
+              id="leetcode"
+              key="leetcode"
+              value={formData.socialLinks.leetcode}
+              onChange={handleInputChange}
+              placeholder="Enter your LeetCode profile URL" 
             />
           </div>
-
-          {/* Hero Section */}
+        );
+      case 3:
+        return (
           <div className="space-y-4">
             <h2 className="text-xl font-semibold">Hero Section</h2>
-            <input
-              type="url"
-              name="profileImage"
-              placeholder="Profile Image URL"
-              className="w-full p-2 border rounded"
+            <FormInput 
+              type="url" 
+              name="hero.profileImage"
+              label="Profile Image URL"
+              id="profileImage"
+              key="profileImage"
+              value={formData.hero.profileImage}
+              onChange={handleInputChange}
+              placeholder="Enter URL for your profile image" 
             />
-            <input
-              type="text"
-              name="name"
-              placeholder="Name"
-              className="w-full p-2 border rounded"
+            <FormInput 
+              type="text" 
+              name="hero.name"
+              label="Name"
+              id="name"
+              key="name"
+              value={formData.hero.name}
+              onChange={handleInputChange}
+              placeholder="Enter your full name" 
             />
-            <input
-              type="text"
-              name="title"
-              placeholder="Title"
-              className="w-full p-2 border rounded"
+            <FormInput 
+              type="text" 
+              name="hero.title"
+              label="Title"
+              id="title"
+              key="title"
+              value={formData.hero.title}
+              onChange={handleInputChange}
+              placeholder="Enter your professional title" 
             />
-            <textarea
-              name="description"
-              placeholder="Description"
-              className="w-full p-2 border rounded"
-              rows={3}
+            <FormInput 
+              type="textarea" 
+              name="hero.description"
+              label="Description"
+              id="description"
+              key="description"
+              value={formData.hero.description}
+              onChange={handleInputChange}
+              placeholder="Enter a brief description about yourself" 
+              rows={3} 
             />
-            <input
-              type="url"
-              name="featuredImage"
-              placeholder="Featured Image URL"
-              className="w-full p-2 border rounded"
+            <FormInput 
+              type="url" 
+              name="hero.featuredImage"
+              label="Featured Image URL"
+              id="featuredImage"
+              key="featuredImage"
+              value={formData.hero.featuredImage}
+              onChange={handleInputChange}
+              placeholder="Enter URL for your featured image" 
             />
           </div>
-
-          {/* Services */}
+        );
+      case 4:
+        return (
           <div className="space-y-4">
             <h2 className="text-xl font-semibold">Services</h2>
-            {[1, 2, 3].map((index) => (
+            {[0, 1, 2].map((index) => (
               <div key={index} className="space-y-2 p-4 border rounded">
-                <input
-                  type="text"
-                  name={`service${index}Title`}
-                  placeholder="Service Title"
-                  className="w-full p-2 border rounded"
+                <FormInput 
+                  type="text" 
+                  name={`services.${index}.title`}
+                  label={`Service ${index + 1} Title`}
+                  id={`service${index}Title`}
+                  key={`service${index}Title`}
+                  value={formData.services[index].title}
+                  onChange={handleInputChange}
+                  placeholder={`Service ${index + 1} Title`}
                 />
-                <textarea
-                  name={`service${index}Description`}
-                  placeholder="Service Description"
-                  className="w-full p-2 border rounded"
-                  rows={2}
+                <FormInput 
+                  type="textarea" 
+                  name={`services.${index}.description`}
+                  label={`Service ${index + 1} Description`}
+                  id={`service${index}Description`}
+                  key={`service${index}Description`}
+                  value={formData.services[index].description}
+                  onChange={handleInputChange}
+                  placeholder={`Service ${index + 1} Description`}
+                  rows={2} 
                 />
               </div>
             ))}
           </div>
-
-          {/* Testimonials */}
+        );
+      case 5:
+        return (
           <div className="space-y-4">
             <h2 className="text-xl font-semibold">Testimonials</h2>
-            {[1, 2, 3].map((index) => (
+            {[0, 1, 2].map((index) => (
               <div key={index} className="space-y-2 p-4 border rounded">
-                <textarea
-                  name={`testimonial${index}Quote`}
-                  placeholder="Testimonial Quote"
-                  className="w-full p-2 border rounded"
-                  rows={3}
+                <FormInput 
+                  type="textarea" 
+                  name={`testimonials.${index}.quote`}
+                  label={`Testimonial ${index + 1} Quote`}
+                  id={`testimonial${index}Quote`}
+                  key={`testimonial${index}Quote`}
+                  value={formData.testimonials[index].quote}
+                  onChange={handleInputChange}
+                  placeholder={`Testimonial ${index + 1} Quote`}
+                  rows={3} 
                 />
-                <input
-                  type="text"
-                  name={`testimonial${index}AuthorName`}
-                  placeholder="Author Name"
-                  className="w-full p-2 border rounded"
+                <FormInput 
+                  type="text" 
+                  name={`testimonials.${index}.author.name`}
+                  label={`Author ${index + 1} Name`}
+                  id={`testimonial${index}AuthorName`}
+                  key={`testimonial${index}AuthorName`}
+                  value={formData.testimonials[index].author.name}
+                  onChange={handleInputChange}
+                  placeholder={`Author ${index + 1} Name`}
                 />
-                <input
-                  type="text"
-                  name={`testimonial${index}AuthorTitle`}
-                  placeholder="Author Title"
-                  className="w-full p-2 border rounded"
+                <FormInput 
+                  type="text" 
+                  name={`testimonials.${index}.author.title`}
+                  label={`Author ${index + 1} Title`}
+                  id={`testimonial${index}AuthorTitle`}
+                  key={`testimonial${index}AuthorTitle`}
+                  value={formData.testimonials[index].author.title}
+                  onChange={handleInputChange}
+                  placeholder={`Author ${index + 1} Title`}
                 />
-                <input
-                  type="url"
-                  name={`testimonial${index}AuthorImage`}
-                  placeholder="Author Image URL"
-                  className="w-full p-2 border rounded"
+                <FormInput 
+                  type="url" 
+                  name={`testimonials.${index}.author.image`}
+                  label={`Author ${index + 1} Image URL`}
+                  id={`testimonial${index}AuthorImage`}
+                  key={`testimonial${index}AuthorImage`}
+                  value={formData.testimonials[index].author.image}
+                  onChange={handleInputChange}
+                  placeholder={`Author ${index + 1} Image URL`}
                 />
-                <input
-                  type="url"
-                  name={`testimonial${index}Image`}
-                  placeholder="Testimonial Image URL"
-                  className="w-full p-2 border rounded"
+                <FormInput 
+                  type="url" 
+                  name={`testimonials.${index}.image`}
+                  label={`Testimonial ${index + 1} Image URL`}
+                  id={`testimonial${index}Image`}
+                  key={`testimonial${index}Image`}
+                  value={formData.testimonials[index].image}
+                  onChange={handleInputChange}
+                  placeholder={`Testimonial ${index + 1} Image URL`}
                 />
               </div>
             ))}
           </div>
-
-          {/* Contact Information */}
+        );
+      case 6:
+        return (
           <div className="space-y-4">
             <h2 className="text-xl font-semibold">Contact Information</h2>
-            <input
-              type="text"
-              name="contactTitle"
-              placeholder="Contact Title"
-              className="w-full p-2 border rounded"
+            <FormInput 
+              type="text" 
+              name="footer.contact.title"
+              label="Contact Title"
+              value={formData.footer.contact.title}
+              onChange={handleInputChange}
+              placeholder="Contact Title" 
             />
-            <input
-              type="text"
-              name="contactSubtitle"
-              placeholder="Contact Subtitle"
-              className="w-full p-2 border rounded"
+            <FormInput 
+              type="text" 
+              name="footer.contact.subtitle"
+              label="Contact Subtitle"
+              value={formData.footer.contact.subtitle}
+              onChange={handleInputChange}
+              placeholder="Contact Subtitle" 
             />
-            <input
-              type="email"
-              name="contactEmail"
-              placeholder="Contact Email"
-              className="w-full p-2 border rounded"
+            <FormInput 
+              type="email" 
+              name="footer.contact.email"
+              label="Contact Email"
+              value={formData.footer.contact.email}
+              onChange={handleInputChange}
+              placeholder="Contact Email" 
             />
           </div>
-
-          {/* Academic Information */}
+        );
+      case 7:
+        return (
           <div className="space-y-4">
             <h2 className="text-xl font-semibold">Academic Information</h2>
-            <input
-              type="text"
-              name="academicTitle"
-              placeholder="Academic Section Title"
-              className="w-full p-2 border rounded"
+            <FormInput 
+              type="text" 
+              name="footer.academic.title"
+              label="Academic Section Title"
+              value={formData.footer.academic.title}
+              onChange={handleInputChange}
+              placeholder="Academic Section Title" 
             />
-            {[1, 2, 3].map((index) => (
+            {[0, 1, 2].map((index) => (
               <div key={index} className="space-y-2">
-                <input
-                  type="text"
-                  name={`qualification${index}`}
-                  placeholder={`Qualification ${index}`}
-                  className="w-full p-2 border rounded"
+                <FormInput 
+                  type="text" 
+                  name={`footer.academic.qualifications.${index}.name`}
+                  label={`Qualification ${index + 1}`}
+                  value={formData.footer.academic.qualifications[index].name}
+                  onChange={handleInputChange}
+                  placeholder={`Qualification ${index + 1}`} 
                 />
-                <input
-                  type="text"
-                  name={`qualification${index}Href`}
-                  placeholder={`Qualification ${index} Link`}
-                  className="w-full p-2 border rounded"
+                <FormInput 
+                  type="text" 
+                  name={`footer.academic.qualifications.${index}.href`}
+                  label={`Qualification ${index + 1} Link`}
+                  value={formData.footer.academic.qualifications[index].href}
+                  onChange={handleInputChange}
+                  placeholder={`Qualification ${index + 1} Link`} 
                 />
               </div>
             ))}
           </div>
+        );
+      default:
+        return null;
+    }
+  };
 
-          {/* Submit Button */}
-          <button
-            type="submit"
-            className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
-          >
-            Save Portfolio Details
-          </button>
-        </form>
+  return (
+    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+      <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-lg p-4 md:p-8">
+        <div className="flex flex-col md:flex-row gap-8">
+          <ProgressBar currentStep={currentStep} totalSteps={totalSteps} />
+
+          <div className="flex-1 max-w-2xl">
+            <form onSubmit={handleSubmit} className="space-y-8">
+              <div className="space-y-2">
+                <h1 className="text-3xl font-bold text-[#1A1E3C]">
+                  {currentStep === 1 && "Site Details"}
+                  {currentStep === 2 && "Social Links"}
+                  {currentStep === 3 && "Hero Section"}
+                  {currentStep === 4 && "Services"}
+                  {currentStep === 5 && "Testimonials"}
+                  {currentStep === 6 && "Contact Information"}
+                  {currentStep === 7 && "Academic Information"}
+                </h1>
+                <p className="text-gray-500 text-lg">
+                  Please provide all the required information for this section.
+                </p>
+              </div>
+
+              <div className="space-y-6">
+                {renderStep()}
+              </div>
+
+              <div className="flex justify-between pt-8">
+                {currentStep > 1 && (
+                  <button
+                    type="button"
+                    onClick={prevStep}
+                    className="px-6 py-3 text-[#574EFA] hover:text-[#4A3FF7] font-medium"
+                  >
+                    Go Back
+                  </button>
+                )}
+                {currentStep < totalSteps ? (
+                  <button
+                    type="button"
+                    onClick={nextStep}
+                    className="ml-auto px-6 py-3 bg-[#1A1E3C] text-white rounded-lg hover:bg-[#2A2E4C] transition-colors"
+                  >
+                    Next Step
+                  </button>
+                ) : (
+                  <button
+                    type="submit"
+                    className="ml-auto px-6 py-3 bg-[#574EFA] text-white rounded-lg hover:bg-[#4A3FF7] transition-colors"
+                  >
+                    Submit
+                  </button>
+                )}
+              </div>
+            </form>
+          </div>
+        </div>
       </div>
-    </>
+    </div>
   );
 }
 
 export default Form;
+

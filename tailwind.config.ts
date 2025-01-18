@@ -86,6 +86,9 @@ const config: Config = {
   		max700: {
   			max: '700px'
   		},
+		max750: {
+			max: '750px'
+		},
   		max800: {
   			max: '800px'
   		},

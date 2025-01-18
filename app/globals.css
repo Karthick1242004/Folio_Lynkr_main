@@ -22,10 +22,10 @@
 .fontcss{
   font-family: 'DM Sans';
 }
-/* html ,body{
+html ,body{
   -webkit-overscroll-behavior: none !important;
   overscroll-behavior: none !important;
-} */
+}
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -96,7 +96,6 @@
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
   padding-top: 2rem;
   border-top: 1px solid #e5e7eb;
 }

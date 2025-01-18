@@ -4,19 +4,22 @@ import { X } from 'lucide-react';
 interface NavigationProps {
   isOpen: boolean;
   onClose: () => void;
+  isDark: boolean;
 }
 
-export const Navigation: React.FC<NavigationProps> = ({ isOpen, onClose }) => {
+export const Navigation: React.FC<NavigationProps> = ({ isOpen, onClose, isDark }) => {
   const menuItems = [
-    { text: 'HOME', isHighlight: true },
-    { text: 'ABOUT', isHighlight: false },
-    { text: 'PROJECTS', isHighlight: false },
-    { text: 'EXPERIENCE', isHighlight: false },
-    { text: 'CONTACT', isHighlight: false },
+    { text: 'HOME', isHighlight: true,link:'/' },
+    { text: 'ABOUT', isHighlight: false,link:'/' },
+    { text: 'PROJECTS', isHighlight: false,link:'/' },
+    { text: 'EXPERIENCE', isHighlight: false,link:'/' },
+    { text: 'CONTACT', isHighlight: false,link:'/' },
   ];
 
   return (
-    <div className={`fixed inset-0 bg-gradient-to-b from-black/90 to-transparent dark:from-black/95 dark:to-transparent backdrop-blur-sm transform transition-transform duration-300 ${
+    <div className={`fixed inset-0 bg-gradient-to-b from-black/90 to-transparent ${
+      isDark ? 'from-black/95' : 'from-black/90'
+    } to-transparent backdrop-blur-sm transform transition-transform duration-300 ${
       isOpen ? 'translate-x-0' : '-translate-x-full'
     } z-50`}>
       <div className="flex justify-end p-6">
@@ -28,12 +31,12 @@ export const Navigation: React.FC<NavigationProps> = ({ isOpen, onClose }) => {
         {menuItems.map((item) => (
           <a
             key={item.text}
-            href="#"
+            href={item.link}
             className={`text-4xl name-text !tracking-normal font-bold ${
               item.isHighlight
-                ? 'text-[#ffffff] dark:text-[#E0F01F]'
-                : 'text-black dark:text-white'
-            } hover:text-[#ffffff] dark:hover:text-[#E0F01F] transition-colors`}
+                ? isDark ? 'text-[#E0F01F]' : 'text-[#ffffff]'
+                : isDark ? 'text-[#E0F01F]' : 'text-white'
+            } ${isDark ? 'hover:text-[#E0F01F]' : 'hover:text-[#E0F01F]'} transition-colors`}
           >
             {item.text}
           </a>
