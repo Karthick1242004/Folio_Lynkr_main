@@ -52,7 +52,11 @@ export function Landing() {
             )}
           </div> */}
         </header>
-        <Navigation isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />
+        <Navigation 
+          isOpen={isNavOpen} 
+          onClose={() => setIsNavOpen(false)} 
+          isDark={isDark}
+        />
         <main className="flex flex-col items-center mt-[30%] sm:mt-[6%] justify-center text-center max420:mt-[40%] ">
           <p className="text-gray-500 text-body-sm font-normal dark:text-gray-400 p-2 fontcss tracking-widest flex items-center gap-2">
             <Clock className="w-4 h-4" />
