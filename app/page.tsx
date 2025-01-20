@@ -1,6 +1,5 @@
 'use client';
 
-import { Form } from "./users/Form/page";
 import { Landing } from "@/components/Landing/Landing";
 import SiteOptions from "@/components/SiteOptions/SiteOptions";
 import SiteScroller from "@/components/SiteScroller/SiteScroller";
@@ -11,7 +10,6 @@ export default function Home() {
   return (
     <div className={`${isDark ? 'dark bg-[#121212]' : 'bg-[#F0F0F0]'}`}>
     <Landing />
-    {/* <Form/> */}
     <SiteOptions/>
     <SiteScroller/>
     </div>
