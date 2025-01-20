@@ -102,13 +102,13 @@ export default function Page() {
             } flex-1 max500:!text-[12px]`}>
               Make this site yours by filling out the form. Press the button to start filling out the form, once you have filled out the form, provide your desired domain name in the provided field.
             </p>
-            <button className={`${
+            <Link href="/users/Form" className={`${
               isDark 
                 ? 'bg-blue-500 hover:bg-blue-600' 
                 : 'bg-blue-600 hover:bg-blue-700'
             } text-white px-4 py-2 rounded-full text-sm whitespace-nowrap transition-colors max500:px-3 max500:py-2 max500:text-[12px]`}>
               Make it yours
-            </button>
+            </Link>
           </div>
         </div>
       </div>

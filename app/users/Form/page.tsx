@@ -50,7 +50,7 @@ interface FormDataType {
   };
 }
 
-function Form() {
+export function Form() {
   const { subdomain, availability, loading, setSubdomain, setAvailability, setLoading } = useStore();
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 7;
@@ -156,7 +156,9 @@ function Form() {
       const successData = await updateGistUrlResponse.json();
       console.log("Repository updated successfully:", successData);
 
-      alert("Form submitted successfully!");
+      // Show success message with the subdomain URL
+      const siteUrl = `https://${subdomain}.netlify.app`;
+      alert(`Form submitted successfully!\n\nYour site will be available shortly at:\n${siteUrl}\n\nPlease note it may take a few minutes for the site to be deployed.`);
     } catch (error) {
       console.error("Error during submission:", error);
       alert("An error occurred. Please try again.");

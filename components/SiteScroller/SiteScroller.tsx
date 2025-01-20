@@ -12,7 +12,7 @@ export default function SiteScroller() {
     <div className="flex flex-row gap-2 w-full px-4 py-4 max700:flex-col max700:gap-4 max700:items-center">
       {Array.from({length:3}).map((_,index)=>(
         <div key={index} className="flex flex-col gap-3 w-1/3 max700:w-full">
-          {Array.from({length:20}).map((_,index)=>(
+          {Array.from({length:5}).map((_,index)=>(
             <Link href="/users/site" key={index} className={`group ${isDark ? 'border rounded-lg border-gray-600' : 'border rounded-lg border-gray-200'}`}>
               <div 
                 key={index} 
