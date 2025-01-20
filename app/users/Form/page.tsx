@@ -50,7 +50,7 @@ interface FormDataType {
   };
 }
 
-export function Form() {
+function Page() {
   const { subdomain, availability, loading, setSubdomain, setAvailability, setLoading } = useStore();
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 7;
@@ -549,5 +549,5 @@ export function Form() {
   );
 }
 
-export default Form;
+export default Page;
 
