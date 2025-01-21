@@ -69,12 +69,15 @@ function Page() {
       description: '',
       featuredImage: '',
     },
-    services: Array(3).fill({ title: '', description: '' }),
-    testimonials: Array(3).fill({
+    services: Array(3).fill(null).map(() => ({ 
+      title: '', 
+      description: '' 
+    })),
+    testimonials: Array(3).fill(null).map(() => ({
       quote: '',
       author: { name: '', title: '', image: '' },
       image: '',
-    }),
+    })),
     footer: {
       contact: {
         title: '',
@@ -83,7 +86,10 @@ function Page() {
       },
       academic: {
         title: '',
-        qualifications: Array(3).fill({ name: '', href: '' }),
+        qualifications: Array(3).fill(null).map(() => ({ 
+          name: '', 
+          href: '' 
+        })),
       },
     },
   });
@@ -91,13 +97,14 @@ function Page() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => {
-      const keys = name.split('.');
+      const newFormData = { ...prev };
+      const keys = name.split('.');  // Split the name by dots
+      let current: Record<string, any> = newFormData;
+      
       if (keys.length === 1) {
         return { ...prev, [name]: value };
       }
       
-      const newFormData = { ...prev };
-      let current: any = newFormData;
       for (let i = 0; i < keys.length - 1; i++) {
         current = current[keys[i]];
       }
@@ -108,6 +115,10 @@ function Page() {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    
+    if (currentStep !== totalSteps) {
+      return;
+    }
 
     if (!subdomain || !availability) {
       alert("Please enter and check the availability of the subdomain.");
@@ -197,6 +208,10 @@ function Page() {
     setCurrentStep((prev) => Math.max(prev - 1, 1));
   };
 
+  const handleStepClick = (step: number) => {
+    setCurrentStep(step);
+  };
+
   const renderStep = () => {
     switch (currentStep) {
       case 1:
@@ -235,7 +250,7 @@ function Page() {
         );
       case 2:
         return (
-          <div className="space-y-4">
+          <div className="space-y-4 ">
             <h2 className="text-xl font-semibold">Social Links</h2>
             <FormInput 
               type="url" 
@@ -328,7 +343,7 @@ function Page() {
         );
       case 4:
         return (
-          <div className="space-y-4">
+          <div className="space-y-4 !h-[370px] overflow-y-scroll">
             <h2 className="text-xl font-semibold">Services</h2>
             {[0, 1, 2].map((index) => (
               <div key={index} className="space-y-2 p-4 border rounded">
@@ -359,7 +374,7 @@ function Page() {
         );
       case 5:
         return (
-          <div className="space-y-4">
+          <div className="space-y-4 !h-[370px] overflow-y-scroll">
             <h2 className="text-xl font-semibold">Testimonials</h2>
             {[0, 1, 2].map((index) => (
               <div key={index} className="space-y-2 p-4 border rounded">
@@ -488,12 +503,16 @@ function Page() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+    <div className="min-h-screen bg-gray-50 p-4 md:p-8 ">
       <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-lg p-4 md:p-8">
         <div className="flex flex-col md:flex-row gap-8">
-          <ProgressBar currentStep={currentStep} totalSteps={totalSteps} />
+          <ProgressBar 
+            currentStep={currentStep} 
+            totalSteps={totalSteps} 
+            onStepClick={handleStepClick}
+          />
 
-          <div className="flex-1 max-w-2xl">
+          <div className="flex-1 max-w-2xl !min-h-[10%]">
             <form onSubmit={handleSubmit} className="space-y-8">
               <div className="space-y-2">
                 <h1 className="text-3xl font-bold text-[#1A1E3C]">
