@@ -4,6 +4,7 @@ import { useStore } from '@/store/store';
 import axios from 'axios';
 import ProgressBar from '@/components/ProgreseBar/ProgreseBar';
 import { FormInput } from '@/components/ProgreseBar/FormInput';
+import { CldUploadWidget ,CloudinaryUploadWidgetResults} from 'next-cloudinary';
 
 // Define types for the nested form data structure
 interface FormDataType {
@@ -166,8 +167,6 @@ function Page() {
 
       const successData = await updateGistUrlResponse.json();
       console.log("Repository updated successfully:", successData);
-
-      // Show success message with the subdomain URL
       const siteUrl = `https://${subdomain}.netlify.app`;
       alert(`Form submitted successfully!\n\nYour site will be available shortly at:\n${siteUrl}\n\nPlease note it may take a few minutes for the site to be deployed.`);
     } catch (error) {
@@ -210,6 +209,71 @@ function Page() {
 
   const handleStepClick = (step: number) => {
     setCurrentStep(step);
+  };
+
+  const handleImageUpload = (fieldName: string) => (result: CloudinaryUploadWidgetResults) => {
+    if (result.info && typeof result.info === 'object' && 'secure_url' in result.info) {
+      const imageUrl = result.info.secure_url;
+      setFormData(prev => {
+        const newFormData = { ...prev };
+        const keys = fieldName.split('.');
+        let current: Record<string, any> = newFormData;
+        
+        for (let i = 0; i < keys.length - 1; i++) {
+          if (keys[i].match(/^\d+$/)) {
+            current = current[parseInt(keys[i])];
+          } else {
+            current = current[keys[i]];
+          }
+        }
+        
+        current[keys[keys.length - 1]] = imageUrl;
+        return newFormData;
+      });
+    }
+  };
+
+  const ImageUploadField = ({ fieldName, label }: { fieldName: string; label: string }) => {
+    const getValue = (obj: any, path: string) => {
+      return path.split('.').reduce((acc, part) => {
+        if (acc && typeof acc === 'object') {
+          return acc[part];
+        }
+        return '';
+      }, obj);
+    };
+
+    return (
+      <div className="space-y-2">
+        <label className="block text-sm font-medium text-gray-700">{label}</label>
+        <div className="flex flex-col gap-2">
+        <CldUploadWidget
+  uploadPreset="my_uploads"
+  // cloud_name="dqvgfjr6v"
+  onSuccess={handleImageUpload(fieldName)}
+>
+  {({ open }) => (
+    <button
+      type="button"
+      onClick={() => open()}
+      className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+    >
+      Upload Image
+    </button>
+  )}
+</CldUploadWidget>
+          {getValue(formData, fieldName) && (
+            <div className="relative w-10 h-10">
+              <img
+                src={getValue(formData, fieldName)}
+                alt={`${label} preview`}
+                className="w-full h-full object-cover rounded-md"
+              />
+            </div>
+          )}
+        </div>
+      </div>
+    );
   };
 
   const renderStep = () => {
@@ -288,15 +352,13 @@ function Page() {
         return (
           <div className="space-y-4">
             <h2 className="text-xl font-semibold">Hero Section</h2>
-            <FormInput 
-              type="url" 
-              name="hero.profileImage"
-              label="Profile Image URL"
-              id="profileImage"
-              key="profileImage"
-              value={formData.hero.profileImage}
-              onChange={handleInputChange}
-              placeholder="Enter URL for your profile image" 
+            <ImageUploadField 
+              fieldName="hero.profileImage"
+              label="Profile Image"
+            />
+            <ImageUploadField 
+              fieldName="hero.featuredImage"
+              label="Featured Image"
             />
             <FormInput 
               type="text" 
@@ -328,16 +390,6 @@ function Page() {
               onChange={handleInputChange}
               placeholder="Enter a brief description about yourself" 
               rows={3} 
-            />
-            <FormInput 
-              type="url" 
-              name="hero.featuredImage"
-              label="Featured Image URL"
-              id="featuredImage"
-              key="featuredImage"
-              value={formData.hero.featuredImage}
-              onChange={handleInputChange}
-              placeholder="Enter URL for your featured image" 
             />
           </div>
         );
@@ -409,25 +461,13 @@ function Page() {
                   onChange={handleInputChange}
                   placeholder={`Author ${index + 1} Title`}
                 />
-                <FormInput 
-                  type="url" 
-                  name={`testimonials.${index}.author.image`}
-                  label={`Author ${index + 1} Image URL`}
-                  id={`testimonial${index}AuthorImage`}
-                  key={`testimonial${index}AuthorImage`}
-                  value={formData.testimonials[index].author.image}
-                  onChange={handleInputChange}
-                  placeholder={`Author ${index + 1} Image URL`}
+                <ImageUploadField 
+                  fieldName={`testimonials.${index}.author.image`}
+                  label={`Author ${index + 1} Image`}
                 />
-                <FormInput 
-                  type="url" 
-                  name={`testimonials.${index}.image`}
-                  label={`Testimonial ${index + 1} Image URL`}
-                  id={`testimonial${index}Image`}
-                  key={`testimonial${index}Image`}
-                  value={formData.testimonials[index].image}
-                  onChange={handleInputChange}
-                  placeholder={`Testimonial ${index + 1} Image URL`}
+                <ImageUploadField 
+                  fieldName={`testimonials.${index}.image`}
+                  label={`Testimonial ${index + 1} Image`}
                 />
               </div>
             ))}
