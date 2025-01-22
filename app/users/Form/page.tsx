@@ -266,7 +266,7 @@ function Page() {
           </CldUploadWidget>
           
           {getValue(formData, fieldName) && (
-            <div className="relative w-32 h-32">
+            <div className="relative w-12 h-12">
               <img
                 src={getValue(formData, fieldName)}
                 alt={`${label} preview`}
