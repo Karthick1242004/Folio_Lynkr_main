@@ -249,7 +249,7 @@ function Page() {
         <div className="flex flex-col gap-2">
         <CldUploadWidget
   uploadPreset="my_uploads"
-  // cloud_name="dqvgfjr6v"
+  cloud_name="dqvgfjr6v"
   onSuccess={handleImageUpload(fieldName)}
 >
   {({ open }) => (
