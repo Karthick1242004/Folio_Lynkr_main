@@ -233,43 +233,40 @@ function Page() {
     }
   };
 
-  const ImageUploadField = ({ fieldName, label }: { fieldName: string; label: string }) => {
-    const getValue = (obj: any, path: string) => {
-      return path.split('.').reduce((acc, part) => {
-        if (acc && typeof acc === 'object') {
-          return acc[part];
-        }
-        return '';
-      }, obj);
-    };
+  const getValue = (obj: FormDataType, path: string): string => {
+    return path.split('.').reduce((acc: any, part) => {
+      if (acc && typeof acc === 'object') {
+        return acc[part];
+      }
+      return '';
+    }, formData);
+  };
 
+  const ImageUploadField = ({ fieldName, label }: { fieldName: string; label: string }) => {
     return (
       <div className="space-y-2">
         <label className="block text-sm font-medium text-gray-700">{label}</label>
         <div className="flex flex-col gap-2">
-        <CldUploadWidget 
-          options={{ 
-            cloudName: 'dqvgfjr6v',
-            uploadPreset: 'my_uploads'
-          }}
-          onSuccess={(result: any) => {
-            if (result.info && typeof result.info === 'object' && 'secure_url' in result.info) {
-              handleImageUpload(fieldName)(result);
-            }
-          }}
-        >
-          {({ open }) => (
-            <button
-            type="button"
-            onClick={() => open()}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+          <CldUploadWidget 
+            options={{ 
+              cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+              uploadPreset: 'my_uploads'
+            }}
+            onSuccess={(result: any) => {
+              if (result.info && typeof result.info === 'object' && 'secure_url' in result.info) {
+                handleImageUpload(fieldName)(result);
+              }
+            }}
           >
-            Upload Image
-          </button>
-        )}
-      </CldUploadWidget>
+            {({ open }) => (
+              <button onClick={() => open()} type="button" className="w-full px-4 py-2 border border-gray-300 rounded-md">
+                Upload Image
+              </button>
+            )}
+          </CldUploadWidget>
+          
           {getValue(formData, fieldName) && (
-            <div className="relative w-10 h-10">
+            <div className="relative w-32 h-32">
               <img
                 src={getValue(formData, fieldName)}
                 alt={`${label} preview`}
