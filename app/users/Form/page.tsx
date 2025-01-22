@@ -264,7 +264,6 @@ function Page() {
               </button>
             )}
           </CldUploadWidget>
-          
           {getValue(formData, fieldName) && (
             <div className="relative w-12 h-12">
               <img
