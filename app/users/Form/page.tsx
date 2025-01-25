@@ -5,6 +5,7 @@ import axios from 'axios';
 import ProgressBar from '@/components/ProgreseBar/ProgreseBar';
 import { FormInput } from '@/components/ProgreseBar/FormInput';
 import { CldUploadWidget ,CloudinaryUploadWidgetResults} from 'next-cloudinary';
+import { useRouter } from 'next/navigation';
 
 // Define types for the nested form data structure
 interface FormDataType {
@@ -94,6 +95,7 @@ function Page() {
       },
     },
   });
+  const router = useRouter();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -117,6 +119,7 @@ function Page() {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
+    // Only process submission if we're on the final step
     if (currentStep !== totalSteps) {
       return;
     }
@@ -169,6 +172,10 @@ function Page() {
       console.log("Repository updated successfully:", successData);
       const siteUrl = `https://${subdomain}.netlify.app`;
       alert(`Form submitted successfully!\n\nYour site will be available shortly at:\n${siteUrl}\n\nPlease note it may take a few minutes for the site to be deployed.`);
+      
+      // Add navigation to pipeline page
+      router.push('/users/pipeline');
+      
     } catch (error) {
       console.error("Error during submission:", error);
       alert("An error occurred. Please try again.");
@@ -546,7 +553,7 @@ function Page() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-8 ">
+    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
       <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-lg p-4 md:p-8">
         <div className="flex flex-col md:flex-row gap-8">
           <ProgressBar 
@@ -556,28 +563,26 @@ function Page() {
           />
 
           <div className="flex-1 max-w-2xl !min-h-[10%]">
-            <form onSubmit={handleSubmit} className="space-y-8">
-              <div className="space-y-2">
-                <h1 className="text-3xl font-bold text-[#1A1E3C]">
-                  {currentStep === 1 && "Site Details"}
-                  {currentStep === 2 && "Social Links"}
-                  {currentStep === 3 && "Hero Section"}
-                  {currentStep === 4 && "Services"}
-                  {currentStep === 5 && "Testimonials"}
-                  {currentStep === 6 && "Contact Information"}
-                  {currentStep === 7 && "Academic Information"}
-                </h1>
-                <p className="text-gray-500 text-lg">
-                  Please provide all the required information for this section.
-                </p>
-              </div>
+            <div className="space-y-2">
+              <h1 className="text-3xl font-bold text-[#1A1E3C]">
+                {currentStep === 1 && "Site Details"}
+                {currentStep === 2 && "Social Links"}
+                {currentStep === 3 && "Hero Section"}
+                {currentStep === 4 && "Services"}
+                {currentStep === 5 && "Testimonials"}
+                {currentStep === 6 && "Contact Information"}
+                {currentStep === 7 && "Academic Information"}
+              </h1>
+              <p className="text-gray-500 text-lg">
+                Please provide all the required information for this section.
+              </p>
+            </div>
 
+            {currentStep === 6 ? (
+              // Contact Information outside form
               <div className="space-y-6">
                 {renderStep()}
-              </div>
-
-              <div className="flex justify-between pt-8">
-                {currentStep > 1 && (
+                <div className="flex justify-between pt-8">
                   <button
                     type="button"
                     onClick={prevStep}
@@ -585,8 +590,6 @@ function Page() {
                   >
                     Go Back
                   </button>
-                )}
-                {currentStep < totalSteps ? (
                   <button
                     type="button"
                     onClick={nextStep}
@@ -594,16 +597,44 @@ function Page() {
                   >
                     Next Step
                   </button>
-                ) : (
-                  <button
-                    type="submit"
-                    className="ml-auto px-6 py-3 bg-[#574EFA] text-white rounded-lg hover:bg-[#4A3FF7] transition-colors"
-                  >
-                    Submit
-                  </button>
-                )}
+                </div>
               </div>
-            </form>
+            ) : (
+              // Form for other sections
+              <form onSubmit={handleSubmit} className="space-y-8">
+                <div className="space-y-6">
+                  {renderStep()}
+                </div>
+
+                <div className="flex justify-between pt-8">
+                  {currentStep > 1 && (
+                    <button
+                      type="button"
+                      onClick={prevStep}
+                      className="px-6 py-3 text-[#574EFA] hover:text-[#4A3FF7] font-medium"
+                    >
+                      Go Back
+                    </button>
+                  )}
+                  {currentStep < totalSteps ? (
+                    <button
+                      type="button"
+                      onClick={nextStep}
+                      className="ml-auto px-6 py-3 bg-[#1A1E3C] text-white rounded-lg hover:bg-[#2A2E4C] transition-colors"
+                    >
+                      Next Step
+                    </button>
+                  ) : (
+                    <button
+                      type="submit"
+                      className="ml-auto px-6 py-3 bg-[#574EFA] text-white rounded-lg hover:bg-[#4A3FF7] transition-colors"
+                    >
+                      Submit
+                    </button>
+                  )}
+                </div>
+              </form>
+            )}
           </div>
         </div>
       </div>

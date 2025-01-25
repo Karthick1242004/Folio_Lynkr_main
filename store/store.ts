@@ -19,7 +19,12 @@ interface NavigationState {
   setIsNavOpen: (isOpen: boolean) => void;
 }
 
-interface Store extends ThemeState, FormState, NavigationState {}
+interface AuthState {
+  showDropdown: boolean;
+  setShowDropdown: (show: boolean) => void;
+}
+
+interface Store extends ThemeState, FormState, NavigationState, AuthState {}
 
 export const useStore = create<Store>((set) => ({
   // Theme state
@@ -37,4 +42,8 @@ export const useStore = create<Store>((set) => ({
   // Navigation state
   isNavOpen: false,
   setIsNavOpen: (isOpen) => set({ isNavOpen: isOpen }),
+
+  // Auth state
+  showDropdown: false,
+  setShowDropdown: (show) => set({ showDropdown: show }),
 }));

@@ -10,7 +10,7 @@ interface NavigationProps {
 export const Navigation: React.FC<NavigationProps> = ({ isOpen, onClose, isDark }) => {
   const menuItems = [
     { text: 'HOME', isHighlight: true,link:'/' },
-    { text: 'ABOUT', isHighlight: false,link:'/' },
+    { text: 'ABOUT', isHighlight: false,link:'/users/pipeline' },
     { text: 'PROJECTS', isHighlight: false,link:'/' },
     { text: 'EXPERIENCE', isHighlight: false,link:'/' },
     { text: 'CONTACT', isHighlight: false,link:'/' },

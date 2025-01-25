@@ -11,11 +11,24 @@ import Darklogo from "../../assets/33.png";
 import Dark from "../../assets/3.png";
 import Lightlogo from "../../assets/44.png";
 import Light from "../../assets/4.png";
-import { signIn, signOut, useSession } from 'next-auth/react';
+import { GoogleSignin } from '../GoogleSignin/Signin';
+import { useState, useRef, useEffect } from 'react';
 
 export function Landing() {
   const { isDark, toggleTheme, isNavOpen, setIsNavOpen } = useStore();
-  const { data: session } = useSession();
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   return (
     <div className={`min-h-screen transition-colors duration-300 ${isDark ? 'dark bg-[#121212]' : 'bg-[#F0F0F0]'}`}>
@@ -33,24 +46,8 @@ export function Landing() {
           />
           <div className="flex items-center gap-2 sm:gap-4">
             <ThemeToggle isDark={isDark} onToggle={toggleTheme} />
+            <GoogleSignin />
           </div>
-          {/* <div>
-            {session ? (
-              <button 
-                onClick={() => signOut()}
-                className='text-white bg-black px-4 py-2 rounded-md text-body-sm font-normal dark:text-gray-400 p-2 fontcss tracking-widest flex items-center gap-2'
-              >
-                Sign Out
-              </button>
-            ) : (
-              <button 
-                onClick={() => signIn('google')}
-                className='text-white bg-black px-4 py-2 rounded-md text-body-sm font-normal dark:text-gray-400 p-2 fontcss tracking-widest flex items-center gap-2'
-              >
-                Sign in with Google
-              </button>
-            )}
-          </div> */}
         </header>
         <Navigation 
           isOpen={isNavOpen} 
