@@ -24,7 +24,12 @@ interface AuthState {
   setShowDropdown: (show: boolean) => void;
 }
 
-interface Store extends ThemeState, FormState, NavigationState, AuthState {}
+interface PaymentState {
+  isPaymentComplete: boolean;
+  setPaymentComplete: (status: boolean) => void;
+}
+
+interface Store extends ThemeState, FormState, NavigationState, AuthState, PaymentState {}
 
 export const useStore = create<Store>((set) => ({
   // Theme state
@@ -46,4 +51,8 @@ export const useStore = create<Store>((set) => ({
   // Auth state
   showDropdown: false,
   setShowDropdown: (show) => set({ showDropdown: show }),
+
+  // Payment state
+  isPaymentComplete: false,
+  setPaymentComplete: (status) => set({ isPaymentComplete: status }),
 }));

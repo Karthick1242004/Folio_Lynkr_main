@@ -6,6 +6,7 @@ import ProgressBar from '@/components/ProgreseBar/ProgreseBar';
 import { FormInput } from '@/components/ProgreseBar/FormInput';
 import { CldUploadWidget ,CloudinaryUploadWidgetResults} from 'next-cloudinary';
 import { useRouter } from 'next/navigation';
+import Payment from '@/components/Payment/Payment';
 
 // Define types for the nested form data structure
 interface FormDataType {
@@ -53,7 +54,7 @@ interface FormDataType {
 }
 
 function Page() {
-  const { subdomain, availability, loading, setSubdomain, setAvailability, setLoading } = useStore();
+  const { subdomain, availability, loading, setSubdomain, setAvailability, setLoading, isPaymentComplete } = useStore();
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 7;
   const [formData, setFormData] = useState<FormDataType>({
@@ -119,8 +120,15 @@ function Page() {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
-    // Only process submission if we're on the final step
     if (currentStep !== totalSteps) {
+      return;
+    }
+
+    // Get the latest payment status directly from the store
+    const { isPaymentComplete } = useStore.getState();
+
+    if (!isPaymentComplete) {
+      alert("Please complete the payment first");
       return;
     }
 
@@ -625,12 +633,19 @@ function Page() {
                       Next Step
                     </button>
                   ) : (
-                    <button
-                      type="submit"
-                      className="ml-auto px-6 py-3 bg-[#574EFA] text-white rounded-lg hover:bg-[#4A3FF7] transition-colors"
-                    >
-                      Submit
-                    </button>
+                    <Payment 
+                      onSuccess={() => {
+                        // Create a synthetic form submit event
+                        const submitEvent = new Event('submit', {
+                          bubbles: true,
+                          cancelable: true,
+                        }) as unknown as FormEvent<HTMLFormElement>;
+                        
+                        // Call handleSubmit with a slight delay to ensure state is updated
+                        setTimeout(() => handleSubmit(submitEvent), 100);
+                      }} 
+                      amount={499}
+                    />
                   )}
                 </div>
               </form>
