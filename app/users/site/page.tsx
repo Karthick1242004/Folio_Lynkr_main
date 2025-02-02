@@ -1,17 +1,29 @@
 'use client'
 import Link from "next/link"
 import { Heart } from 'lucide-react'
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import siteData from '@/Data/data.json'
 import Image from "next/image"
 import { PageNavigation } from '@/components/PageNav/PageNavigation'
 import { useStore } from '@/store/store'
+import { useSearchParams } from 'next/navigation'
 
 export default function Page() {
   const [isLiked, setIsLiked] = useState(false)
-  const { site } = siteData
+  const searchParams = useSearchParams()
+  const siteId = searchParams.get('id')
+  const [currentSite, setCurrentSite] = useState(siteData.sites[0])
   const { isNavOpen, setIsNavOpen } = useStore()
   const isDark = useStore((state) => state.isDark)
+
+  useEffect(() => {
+    if (siteId) {
+      const site = siteData.sites.find(site => site.id === parseInt(siteId))
+      if (site) {
+        setCurrentSite(site)
+      }
+    }
+  }, [siteId])
 
   return (
     <div className={`${isDark ? 'bg-[#121212]' : 'bg-[#F0F0F0]'}`}>
@@ -22,10 +34,10 @@ export default function Page() {
       <div className="max-w-4xl max500:!mt-[7%] mx-auto px-4">
         <div className="space-y-1">
           <h1 className={`text-[32px] font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
-            {site.title}
+            {currentSite.title}
           </h1>
           <p className={`text-[14px] ${isDark ? 'text-gray-400' : 'text-gray-500'} max-w-[50%] max500:max-w-[100%]`}>
-            {site.description}
+            {currentSite.description}
           </p>
           <div className="flex items-center justify-between pt-2 max500:flex-col max500:gap-2 max500:items-start">
             <div className="flex items-center gap-[1px]">
@@ -33,12 +45,12 @@ export default function Page() {
                 isDark ? 'bg-gray-800 hover:bg-gray-700' : 'bg-black/5 hover:bg-black/10'
               } px-3 py-2 rounded-l-full transition-colors ${isDark ? 'text-gray-200' : 'text-gray-700'}`}>
                 <Image src="/next-js.svg" alt="Next.js" width={16} height={16} />
-                Built with <span className="font-semibold">{site.builtWith}</span>
+                Built with <span className="font-semibold">{currentSite.builtWith}</span>
               </p>
               <p className={`inline-flex items-center gap-2 text-sm ${
                 isDark ? 'bg-gray-800 hover:bg-gray-700' : 'bg-black/5 hover:bg-black/10'
               } px-3 py-2 rounded-r-full transition-colors ${isDark ? 'text-gray-200' : 'text-gray-700'}`}>
-                Price: <span className="font-extrabold text-[16px]">₹{site.amount}</span>
+                Price: <span className="font-extrabold text-[16px]">₹{currentSite.amount}</span>
               </p>
             </div>
             <div className="flex items-center gap-1">
@@ -58,7 +70,7 @@ export default function Page() {
                 {isLiked ? 'Liked' : 'Like'} {isLiked ? 1 : null}
               </button>
               <Link
-                href={site.visitUrl}
+                href={currentSite.visitUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`inline-flex items-center gap-1.5 text-sm border ${
@@ -81,8 +93,8 @@ export default function Page() {
           <div>
             <Image 
               className="rounded-[10px] overflow-hidden mt-4 pb-1" 
-              src={site.imageUrl} 
-              alt={site.title} 
+              src={currentSite.imageUrl} 
+              alt={currentSite.title} 
               width={1000} 
               height={1000} 
             />
@@ -102,7 +114,7 @@ export default function Page() {
             } flex-1 max500:!text-[12px]`}>
               Make this site yours by filling out the form. Press the button to start filling out the form, once you have filled out the form, provide your desired domain name in the provided field.
             </p>
-            <Link href="/users/Form" className={`${
+            <Link href={currentSite.formUrl} className={`${
               isDark 
                 ? 'bg-blue-500 hover:bg-blue-600' 
                 : 'bg-blue-600 hover:bg-blue-700'

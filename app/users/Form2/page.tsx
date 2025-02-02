@@ -4,110 +4,112 @@ import { useStore } from '@/store/store';
 import axios from 'axios';
 import ProgressBar from '@/components/ProgreseBar/ProgreseBar';
 import { FormInput } from '@/components/ProgreseBar/FormInput';
-import { CldUploadWidget ,CloudinaryUploadWidgetResults} from 'next-cloudinary';
+import { CldUploadWidget, CloudinaryUploadWidgetResults } from 'next-cloudinary';
 import { useRouter } from 'next/navigation';
 import Payment from '@/components/Payment/Payment';
 
 interface FormDataType {
-  siteTitle: string;
-  subdomain: string;
-  socialLinks: {
-    github: string;
-    linkedin: string;
-    leetcode: string;
-  };
-  hero: {
-    profileImage: string;
-    name: string;
+  projects: Array<{
+    projectName: string;
+    projectType: string;
+    projectContent: string;
+    projectImage: string;
+    projectUrl: string;
+    githubUrl: string;
+  }>;
+  top_project: {
     title: string;
     description: string;
-    featuredImage: string;
+    websiteUrl: string;
+    websiteDisplay: string;
   };
   repo_name: {
-    repo: string,
-  },
+    repo: string;
+  }
+  contacts: Array<{
+    id: number;
+    name: string;
+    designation: string;
+    url: string;
+  }>;
   services: Array<{
     title: string;
     description: string;
   }>;
-  testimonials: Array<{
-    quote: string;
-    author: {
-      name: string;
-      title: string;
-      image: string;
-    };
+  skillset: {
     image: string;
-  }>;
-  footer: {
-    contact: {
-      title: string;
-      subtitle: string;
-      email: string;
-    };
-    academic: {
-      title: string;
-      qualifications: Array<{
-        name: string;
-        href: string;
-      }>;
-    };
   };
+  hero: {
+    name: string;
+    tagline: string;
+    resumeUrl: string;
+    resumeText: string;
+  };
+  testimonials: Array<{
+    id: number;
+    name: string;
+    designation: string;
+    content: string;
+  }>;
 }
 
 function Page() {
   const { subdomain, availability, loading, setSubdomain, setAvailability, setLoading, isPaymentComplete } = useStore();
   const [currentStep, setCurrentStep] = useState(1);
-  const totalSteps = 7;
+  const totalSteps = 8;
   const [formData, setFormData] = useState<FormDataType>({
-    siteTitle: '',
-    subdomain: '',
-    socialLinks: {
-      github: '',
-      linkedin: '',
-      leetcode: '',
-    },
-    hero: {
-      profileImage: '',
-      name: '',
+    projects: Array(3).fill(null).map(() => ({
+      projectName: '',
+      projectType: '',
+      projectContent: '',
+      projectImage: '',
+      projectUrl: '',
+      githubUrl: '',
+    })),
+    top_project: {
       title: '',
       description: '',
-      featuredImage: '',
+      websiteUrl: '',
+      websiteDisplay: '',
     },
     repo_name: {
-      repo: 'bento_portfolio',
+      repo: 'Ace_portfolio_lynkr',
     },
-    services: Array(3).fill(null).map(() => ({ 
-      title: '', 
-      description: '' 
+    contacts: Array(3).fill(null).map((_, index) => ({
+      id: index + 1,
+      name: '',
+      designation: '',
+      url: '',
     })),
-    testimonials: Array(3).fill(null).map(() => ({
-      quote: '',
-      author: { name: '', title: '', image: '' },
+    services: Array(3).fill(null).map(() => ({
+      title: '',
+      description: '',
+    })),
+    skillset: {
       image: '',
-    })),
-    footer: {
-      contact: {
-        title: '',
-        subtitle: '',
-        email: '',
-      },
-      academic: {
-        title: '',
-        qualifications: Array(3).fill(null).map(() => ({ 
-          name: '', 
-          href: '' 
-        })),
-      },
     },
+    hero: {
+      name: '',
+      tagline: '',
+      resumeUrl: '',
+      resumeText: '',
+    },
+    testimonials: Array(3).fill(null).map((_, index) => ({
+      id: index,
+      name: '',
+      designation: '',
+      content: '',
+    })),
   });
+
   const router = useRouter();
 
+  // Reuse the same helper functions
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => {
       const newFormData = { ...prev };
-      const keys = name.split('.');  // Split the name by dots
+      const keys = name.split('.');
       let current: Record<string, any> = newFormData;
       
       if (keys.length === 1) {
@@ -122,6 +124,7 @@ function Page() {
     });
   };
 
+  // Reuse the same submission logic
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
@@ -129,7 +132,6 @@ function Page() {
       return;
     }
 
-    // Get the latest payment status directly from the store
     const { isPaymentComplete } = useStore.getState();
 
     if (!isPaymentComplete) {
@@ -148,7 +150,6 @@ function Page() {
     };
 
     try {
-      // Step 1: Create a new Gist
       const createGistResponse = await fetch("https://folio4ubackend-production.up.railway.app/create-gist", {
         method: "POST",
         headers: {
@@ -166,7 +167,6 @@ function Page() {
       const { gistRawUrl } = await createGistResponse.json();
       console.log("Gist created successfully:", gistRawUrl);
 
-      // Step 2: Update the Gist URL in the repository with repoName
       const updateGistUrlResponse = await fetch("https://folio4ubackend-production.up.railway.app/update-gist-url", {
         method: "POST",
         headers: {
@@ -175,7 +175,7 @@ function Page() {
         body: JSON.stringify({ 
           gistRawUrl, 
           subdomain,
-          repoName: formData.repo_name.repo // Send the repo name from formData
+          repoName: formData.repo_name.repo
         }),
       });
 
@@ -194,6 +194,7 @@ function Page() {
     }
   };
 
+  // Reuse availability check
   const checkAvailability = async () => {
     if (!subdomain) {
       alert('Please enter a subdomain');
@@ -218,18 +219,12 @@ function Page() {
     }
   };
 
-  const nextStep = () => {
-    setCurrentStep((prev) => Math.min(prev + 1, totalSteps));
-  };
+  // Navigation functions
+  const nextStep = () => setCurrentStep((prev) => Math.min(prev + 1, totalSteps));
+  const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
+  const handleStepClick = (step: number) => setCurrentStep(step);
 
-  const prevStep = () => {
-    setCurrentStep((prev) => Math.max(prev - 1, 1));
-  };
-
-  const handleStepClick = (step: number) => {
-    setCurrentStep(step);
-  };
-
+  // Image upload handling
   const handleImageUpload = (fieldName: string) => (result: CloudinaryUploadWidgetResults) => {
     if (result.info && typeof result.info === 'object' && 'secure_url' in result.info) {
       const imageUrl = result.info.secure_url;
@@ -305,8 +300,8 @@ function Page() {
           <div className="space-y-6">
             <FormInput
               label="Site Title"
-              name="siteTitle"
-              value={formData.siteTitle}
+              name="top_project.title"
+              value={formData.top_project.title}
               onChange={handleInputChange}
               placeholder="Enter your site title"
               type="text"
@@ -334,231 +329,252 @@ function Page() {
             </div>
           </div>
         );
+
       case 2:
-        return (
-          <div className="space-y-4 ">
-            <h2 className="text-xl font-semibold">Social Links</h2>
-            <FormInput 
-              type="url" 
-              name="socialLinks.github" 
-              label="GitHub URL"
-              id="github"
-              key="github"
-              value={formData.socialLinks.github}
-              onChange={handleInputChange}
-              placeholder="Enter your GitHub profile URL" 
-            />
-            <FormInput 
-              type="url" 
-              name="socialLinks.linkedin"
-              label="LinkedIn URL"
-              id="linkedin"
-              key="linkedin"
-              value={formData.socialLinks.linkedin}
-              onChange={handleInputChange}
-              placeholder="Enter your LinkedIn profile URL" 
-            />
-            <FormInput 
-              type="url" 
-              name="socialLinks.leetcode"
-              label="LeetCode URL"
-              id="leetcode"
-              key="leetcode"
-              value={formData.socialLinks.leetcode}
-              onChange={handleInputChange}
-              placeholder="Enter your LeetCode profile URL" 
-            />
-          </div>
-        );
-      case 3:
         return (
           <div className="space-y-4">
             <h2 className="text-xl font-semibold">Hero Section</h2>
-            <ImageUploadField 
-              fieldName="hero.profileImage"
-              label="Profile Image"
-            />
-            <ImageUploadField 
-              fieldName="hero.featuredImage"
-              label="Featured Image"
-            />
             <FormInput 
               type="text" 
               name="hero.name"
               label="Name"
-              id="name"
-              key="name"
               value={formData.hero.name}
               onChange={handleInputChange}
-              placeholder="Enter your full name" 
+              placeholder="Enter your name" 
             />
             <FormInput 
               type="text" 
-              name="hero.title"
-              label="Title"
-              id="title"
-              key="title"
-              value={formData.hero.title}
+              name="hero.tagline"
+              label="Tagline"
+              value={formData.hero.tagline}
               onChange={handleInputChange}
-              placeholder="Enter your professional title" 
+              placeholder="Enter your tagline" 
             />
             <FormInput 
-              type="textarea" 
-              name="hero.description"
-              label="Description"
-              id="description"
-              key="description"
-              value={formData.hero.description}
+              type="url" 
+              name="hero.resumeUrl"
+              label="Resume URL"
+              value={formData.hero.resumeUrl}
               onChange={handleInputChange}
-              placeholder="Enter a brief description about yourself" 
-              rows={3} 
+              placeholder="Enter your resume URL" 
+            />
+            <FormInput 
+              type="text" 
+              name="hero.resumeText"
+              label="Resume Button Text"
+              value={formData.hero.resumeText}
+              onChange={handleInputChange}
+              placeholder="Enter resume button text" 
             />
           </div>
         );
-      case 4:
+
+      case 3:
         return (
           <div className="space-y-4 !h-[370px] overflow-y-scroll">
+            <h2 className="text-xl font-semibold">Projects</h2>
+            {formData.projects.map((_, index) => (
+              <div key={index} className="space-y-2 p-4 border rounded">
+                <FormInput 
+                  type="text" 
+                  name={`projects.${index}.projectName`}
+                  label="Project Name"
+                  value={formData.projects[index].projectName}
+                  onChange={handleInputChange}
+                  placeholder="Enter project name" 
+                />
+                <FormInput 
+                  type="text" 
+                  name={`projects.${index}.projectType`}
+                  label="Project Type"
+                  value={formData.projects[index].projectType}
+                  onChange={handleInputChange}
+                  placeholder="Enter project type" 
+                />
+                <FormInput 
+                  type="textarea" 
+                  name={`projects.${index}.projectContent`}
+                  label="Project Description"
+                  value={formData.projects[index].projectContent}
+                  onChange={handleInputChange}
+                  placeholder="Enter project description"
+                  rows={3} 
+                />
+                <ImageUploadField 
+                  fieldName={`projects.${index}.projectImage`}
+                  label="Project Image"
+                />
+                <FormInput 
+                  type="url" 
+                  name={`projects.${index}.projectUrl`}
+                  label="Project URL"
+                  value={formData.projects[index].projectUrl}
+                  onChange={handleInputChange}
+                  placeholder="Enter project URL" 
+                />
+                <FormInput 
+                  type="url" 
+                  name={`projects.${index}.githubUrl`}
+                  label="GitHub URL"
+                  value={formData.projects[index].githubUrl}
+                  onChange={handleInputChange}
+                  placeholder="Enter GitHub URL" 
+                />
+              </div>
+            ))}
+          </div>
+        );
+
+      case 4:
+        return (
+          <div className="space-y-4">
             <h2 className="text-xl font-semibold">Services</h2>
-            {[0, 1, 2].map((index) => (
+            {formData.services.map((_, index) => (
               <div key={index} className="space-y-2 p-4 border rounded">
                 <FormInput 
                   type="text" 
                   name={`services.${index}.title`}
-                  label={`Service ${index + 1} Title`}
-                  id={`service${index}Title`}
-                  key={`service${index}Title`}
+                  label="Service Title"
                   value={formData.services[index].title}
                   onChange={handleInputChange}
-                  placeholder={`Service ${index + 1} Title`}
+                  placeholder="Enter service title" 
                 />
                 <FormInput 
                   type="textarea" 
                   name={`services.${index}.description`}
-                  label={`Service ${index + 1} Description`}
-                  id={`service${index}Description`}
-                  key={`service${index}Description`}
+                  label="Service Description"
                   value={formData.services[index].description}
                   onChange={handleInputChange}
-                  placeholder={`Service ${index + 1} Description`}
-                  rows={2} 
-                />
-              </div>
-            ))}
-          </div>
-        );
-      case 5:
-        return (
-          <div className="space-y-4 !h-[370px] overflow-y-scroll">
-            <h2 className="text-xl font-semibold">Testimonials</h2>
-            {[0, 1, 2].map((index) => (
-              <div key={index} className="space-y-2 p-4 border rounded">
-                <FormInput 
-                  type="textarea" 
-                  name={`testimonials.${index}.quote`}
-                  label={`Testimonial ${index + 1} Quote`}
-                  id={`testimonial${index}Quote`}
-                  key={`testimonial${index}Quote`}
-                  value={formData.testimonials[index].quote}
-                  onChange={handleInputChange}
-                  placeholder={`Testimonial ${index + 1} Quote`}
+                  placeholder="Enter service description"
                   rows={3} 
                 />
+              </div>
+            ))}
+          </div>
+        );
+
+      case 5:
+        return (
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold">Testimonials</h2>
+            {formData.testimonials.map((_, index) => (
+              <div key={index} className="space-y-2 p-4 border rounded">
                 <FormInput 
                   type="text" 
-                  name={`testimonials.${index}.author.name`}
-                  label={`Author ${index + 1} Name`}
-                  id={`testimonial${index}AuthorName`}
-                  key={`testimonial${index}AuthorName`}
-                  value={formData.testimonials[index].author.name}
+                  name={`testimonials.${index}.name`}
+                  label="Name"
+                  value={formData.testimonials[index].name}
                   onChange={handleInputChange}
-                  placeholder={`Author ${index + 1} Name`}
+                  placeholder="Enter testimonial author name" 
                 />
                 <FormInput 
                   type="text" 
-                  name={`testimonials.${index}.author.title`}
-                  label={`Author ${index + 1} Title`}
-                  id={`testimonial${index}AuthorTitle`}
-                  key={`testimonial${index}AuthorTitle`}
-                  value={formData.testimonials[index].author.title}
+                  name={`testimonials.${index}.designation`}
+                  label="Designation"
+                  value={formData.testimonials[index].designation}
                   onChange={handleInputChange}
-                  placeholder={`Author ${index + 1} Title`}
+                  placeholder="Enter author designation" 
                 />
-                <ImageUploadField 
-                  fieldName={`testimonials.${index}.author.image`}
-                  label={`Author ${index + 1} Image`}
-                />
-                <ImageUploadField 
-                  fieldName={`testimonials.${index}.image`}
-                  label={`Testimonial ${index + 1} Image`}
+                <FormInput 
+                  type="textarea" 
+                  name={`testimonials.${index}.content`}
+                  label="Content"
+                  value={formData.testimonials[index].content}
+                  onChange={handleInputChange}
+                  placeholder="Enter testimonial content"
+                  rows={3} 
                 />
               </div>
             ))}
           </div>
         );
+
       case 6:
         return (
           <div className="space-y-4">
-            <h2 className="text-xl font-semibold">Contact Information</h2>
-            <FormInput 
-              type="text" 
-              name="footer.contact.title"
-              label="Contact Title"
-              value={formData.footer.contact.title}
-              onChange={handleInputChange}
-              placeholder="Contact Title" 
-            />
-            <FormInput 
-              type="text" 
-              name="footer.contact.subtitle"
-              label="Contact Subtitle"
-              value={formData.footer.contact.subtitle}
-              onChange={handleInputChange}
-              placeholder="Contact Subtitle" 
-            />
-            <FormInput 
-              type="email" 
-              name="footer.contact.email"
-              label="Contact Email"
-              value={formData.footer.contact.email}
-              onChange={handleInputChange}
-              placeholder="Contact Email" 
-            />
-          </div>
-        );
-      case 7:
-        return (
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold">Academic Information</h2>
-            <FormInput 
-              type="text" 
-              name="footer.academic.title"
-              label="Academic Section Title"
-              value={formData.footer.academic.title}
-              onChange={handleInputChange}
-              placeholder="Academic Section Title" 
-            />
-            {[0, 1, 2].map((index) => (
-              <div key={index} className="space-y-2">
+            <h2 className="text-xl font-semibold">Contacts</h2>
+            {formData.contacts.map((_, index) => (
+              <div key={index} className="space-y-2 p-4 border rounded">
                 <FormInput 
                   type="text" 
-                  name={`footer.academic.qualifications.${index}.name`}
-                  label={`Qualification ${index + 1}`}
-                  value={formData.footer.academic.qualifications[index].name}
+                  name={`contacts.${index}.name`}
+                  label="Contact Name"
+                  value={formData.contacts[index].name}
                   onChange={handleInputChange}
-                  placeholder={`Qualification ${index + 1}`} 
+                  placeholder="Enter contact name" 
                 />
                 <FormInput 
                   type="text" 
-                  name={`footer.academic.qualifications.${index}.href`}
-                  label={`Qualification ${index + 1} Link`}
-                  value={formData.footer.academic.qualifications[index].href}
+                  name={`contacts.${index}.designation`}
+                  label="Designation"
+                  value={formData.contacts[index].designation}
                   onChange={handleInputChange}
-                  placeholder={`Qualification ${index + 1} Link`} 
+                  placeholder="Enter designation" 
+                />
+                <FormInput 
+                  type="url" 
+                  name={`contacts.${index}.url`}
+                  label="Contact URL"
+                  value={formData.contacts[index].url}
+                  onChange={handleInputChange}
+                  placeholder="Enter contact URL" 
                 />
               </div>
             ))}
           </div>
         );
+
+      case 7:
+        return (
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold">Top Project</h2>
+            <FormInput 
+              type="text" 
+              name="top_project.title"
+              label="Project Title"
+              value={formData.top_project.title}
+              onChange={handleInputChange}
+              placeholder="Enter project title" 
+            />
+            <FormInput 
+              type="textarea" 
+              name="top_project.description"
+              label="Project Description"
+              value={formData.top_project.description}
+              onChange={handleInputChange}
+              placeholder="Enter project description"
+              rows={3} 
+            />
+            <FormInput 
+              type="url" 
+              name="top_project.websiteUrl"
+              label="Website URL"
+              value={formData.top_project.websiteUrl}
+              onChange={handleInputChange}
+              placeholder="Enter website URL" 
+            />
+            <FormInput 
+              type="text" 
+              name="top_project.websiteDisplay"
+              label="Website Display Text"
+              value={formData.top_project.websiteDisplay}
+              onChange={handleInputChange}
+              placeholder="Enter website display text" 
+            />
+          </div>
+        );
+
+      case 8:
+        return (
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold">Skillset</h2>
+            <ImageUploadField 
+              fieldName="skillset.image"
+              label="Skillset Image"
+            />
+          </div>
+        );
+
       default:
         return null;
     }
@@ -578,23 +594,26 @@ function Page() {
             <div className="space-y-2">
               <h1 className="text-3xl font-bold text-[#1A1E3C]">
                 {currentStep === 1 && "Site Details"}
-                {currentStep === 2 && "Social Links"}
-                {currentStep === 3 && "Hero Section"}
+                {currentStep === 2 && "Hero Section"}
+                {currentStep === 3 && "Projects"}
                 {currentStep === 4 && "Services"}
                 {currentStep === 5 && "Testimonials"}
-                {currentStep === 6 && "Contact Information"}
-                {currentStep === 7 && "Academic Information"}
+                {currentStep === 6 && "Contacts"}
+                {currentStep === 7 && "Top Project"}
+                {currentStep === 8 && "Skillset"}
               </h1>
               <p className="text-gray-500 text-lg">
                 Please provide all the required information for this section.
               </p>
             </div>
 
-            {currentStep === 6 ? (
-              // Contact Information outside form
+            <form onSubmit={handleSubmit} className="space-y-8">
               <div className="space-y-6">
                 {renderStep()}
-                <div className="flex justify-between pt-8">
+              </div>
+
+              <div className="flex justify-between pt-8">
+                {currentStep > 1 && (
                   <button
                     type="button"
                     onClick={prevStep}
@@ -602,6 +621,8 @@ function Page() {
                   >
                     Go Back
                   </button>
+                )}
+                {currentStep < totalSteps ? (
                   <button
                     type="button"
                     onClick={nextStep}
@@ -609,51 +630,20 @@ function Page() {
                   >
                     Next Step
                   </button>
-                </div>
+                ) : (
+                  <Payment 
+                    onSuccess={() => {
+                      const submitEvent = new Event('submit', {
+                        bubbles: true,
+                        cancelable: true,
+                      }) as unknown as FormEvent<HTMLFormElement>;
+                      setTimeout(() => handleSubmit(submitEvent), 100);
+                    }} 
+                    amount={499}
+                  />
+                )}
               </div>
-            ) : (
-              // Form for other sections
-              <form onSubmit={handleSubmit} className="space-y-8">
-                <div className="space-y-6">
-                  {renderStep()}
-                </div>
-
-                <div className="flex justify-between pt-8">
-                  {currentStep > 1 && (
-                    <button
-                      type="button"
-                      onClick={prevStep}
-                      className="px-6 py-3 text-[#574EFA] hover:text-[#4A3FF7] font-medium"
-                    >
-                      Go Back
-                    </button>
-                  )}
-                  {currentStep < totalSteps ? (
-                    <button
-                      type="button"
-                      onClick={nextStep}
-                      className="ml-auto px-6 py-3 bg-[#1A1E3C] text-white rounded-lg hover:bg-[#2A2E4C] transition-colors"
-                    >
-                      Next Step
-                    </button>
-                  ) : (
-                    <Payment 
-                      onSuccess={() => {
-                        // Create a synthetic form submit event
-                        const submitEvent = new Event('submit', {
-                          bubbles: true,
-                          cancelable: true,
-                        }) as unknown as FormEvent<HTMLFormElement>;
-                        
-                        // Call handleSubmit with a slight delay to ensure state is updated
-                        setTimeout(() => handleSubmit(submitEvent), 100);
-                      }} 
-                      amount={499}
-                    />
-                  )}
-                </div>
-              </form>
-            )}
+            </form>
           </div>
         </div>
       </div>
@@ -662,4 +652,3 @@ function Page() {
 }
 
 export default Page;
-
