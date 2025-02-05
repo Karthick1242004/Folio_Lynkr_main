@@ -1,22 +1,18 @@
 import React from 'react';
 
+interface Step {
+  number: number;
+  title: string;
+}
+
 interface ProgressBarProps {
   currentStep: number;
   totalSteps: number;
   onStepClick: (step: number) => void;
+  steps: Step[];
 }
 
-const ProgressBar: React.FC<ProgressBarProps> = ({ currentStep, totalSteps, onStepClick }) => {
-  const steps = [
-    { number: 1, title: 'SITE DETAILS' },
-    { number: 2, title: 'SOCIAL LINKS' },
-    { number: 3, title: 'HERO SECTION' },
-    { number: 4, title: 'SERVICES' },
-    { number: 5, title: 'TESTIMONAILS' },
-    { number: 6, title: 'CONTACT INFO' },
-    { number: 7, title: 'ACADEMIC DETAILS' },
-  ];
-
+const ProgressBar: React.FC<ProgressBarProps> = ({ currentStep, totalSteps, onStepClick, steps }) => {
   return (
     <div className="relative min-h-[600px] w-full md:w-72 bg-[#574EFA] rounded-lg p-8 bg-gradient-to-b from-[#574EFA] to-[#4A3FF7]">
       <div className="space-y-8">

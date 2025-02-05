@@ -1,3 +1,4 @@
+// Form
 "use client"
 import React, { useState, FormEvent } from 'react';
 import { useStore } from '@/store/store';
@@ -7,6 +8,7 @@ import { FormInput } from '@/components/ProgreseBar/FormInput';
 import { CldUploadWidget ,CloudinaryUploadWidgetResults} from 'next-cloudinary';
 import { useRouter } from 'next/navigation';
 import Payment from '@/components/Payment/Payment';
+import data from '@/Data/data.json';
 
 interface FormDataType {
   siteTitle: string;
@@ -102,6 +104,9 @@ function Page() {
     },
   });
   const router = useRouter();
+
+  // Get the steps for the first site (Bento Portfolio)
+  const siteSteps = data.sites[0].steps;
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -572,6 +577,7 @@ function Page() {
             currentStep={currentStep} 
             totalSteps={totalSteps} 
             onStepClick={handleStepClick}
+            steps={siteSteps}
           />
 
           <div className="flex-1 max-w-2xl !min-h-[10%]">

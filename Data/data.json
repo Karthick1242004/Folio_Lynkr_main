@@ -8,7 +8,16 @@
       "amount": "449",
       "imageUrl": "/bentofolio.png",
       "visitUrl": "https://kanisha.vercel.app/",
-      "formUrl": "/users/Form"
+      "formUrl": "/users/Form",
+      "steps": [
+        { "number": 1, "title": "SITE DETAILS" },
+        { "number": 2, "title": "SOCIAL LINKS" },
+        { "number": 3, "title": "HERO SECTION" },
+        { "number": 4, "title": "SERVICES" },
+        { "number": 5, "title": "TESTIMONAILS" },
+        { "number": 6, "title": "CONTACT INFO" },
+        { "number": 7, "title": "ACADEMIC DETAILS" }
+      ]
     },
     {
       "id": 2,
@@ -18,7 +27,17 @@
       "amount": "799",
       "imageUrl": "/Ace_portfolio.png",
       "visitUrl": "https://karthickrajans.vercel.app/",
-      "formUrl": "/users/Form2"
+      "formUrl": "/users/Form2",
+      "steps": [
+        { "number": 1, "title": "SITE DETAILS" },
+        { "number": 2, "title": "HERO SECTION" },
+        { "number": 3, "title": "PROJECTS" },
+        { "number": 4, "title": "SERVICES" },
+        { "number": 5, "title": "TESTIMONIALS" },
+        { "number": 6, "title": "CONTACTS" },
+        { "number": 7, "title": "TOP PROJECT" },
+        { "number": 8, "title": "SKILLSET" }
+      ]
     }
   ]
 }

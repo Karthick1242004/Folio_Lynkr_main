@@ -1,3 +1,4 @@
+// Form2
 "use client"
 import React, { useState, FormEvent } from 'react';
 import { useStore } from '@/store/store';
@@ -7,6 +8,7 @@ import { FormInput } from '@/components/ProgreseBar/FormInput';
 import { CldUploadWidget, CloudinaryUploadWidgetResults } from 'next-cloudinary';
 import { useRouter } from 'next/navigation';
 import Payment from '@/components/Payment/Payment';
+import data from '@/Data/data.json';
 
 interface FormDataType {
   projects: Array<{
@@ -57,6 +59,10 @@ function Page() {
   const { subdomain, availability, loading, setSubdomain, setAvailability, setLoading, isPaymentComplete } = useStore();
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 8;
+  
+  // Get the steps for the second site (3D Interactive Portfolio)
+  const siteSteps = data.sites[1].steps;
+  
   const [formData, setFormData] = useState<FormDataType>({
     projects: Array(3).fill(null).map(() => ({
       projectName: '',
@@ -427,7 +433,7 @@ function Page() {
 
       case 4:
         return (
-          <div className="space-y-4">
+          <div className="space-y-4 !h-[370px] overflow-y-scroll">
             <h2 className="text-xl font-semibold">Services</h2>
             {formData.services.map((_, index) => (
               <div key={index} className="space-y-2 p-4 border rounded">
@@ -455,7 +461,7 @@ function Page() {
 
       case 5:
         return (
-          <div className="space-y-4">
+          <div className="space-y-4 !h-[370px] overflow-y-scroll">
             <h2 className="text-xl font-semibold">Testimonials</h2>
             {formData.testimonials.map((_, index) => (
               <div key={index} className="space-y-2 p-4 border rounded">
@@ -491,7 +497,7 @@ function Page() {
 
       case 6:
         return (
-          <div className="space-y-4">
+          <div className="space-y-4 !h-[370px] overflow-y-scroll">
             <h2 className="text-xl font-semibold">Contacts</h2>
             {formData.contacts.map((_, index) => (
               <div key={index} className="space-y-2 p-4 border rounded">
@@ -588,6 +594,7 @@ function Page() {
             currentStep={currentStep} 
             totalSteps={totalSteps} 
             onStepClick={handleStepClick}
+            steps={siteSteps}
           />
 
           <div className="flex-1 max-w-2xl !min-h-[10%]">
