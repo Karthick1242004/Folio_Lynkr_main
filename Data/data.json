@@ -38,6 +38,22 @@
         { "number": 7, "title": "TOP PROJECT" },
         { "number": 8, "title": "SKILLSET" }
       ]
+    },
+    {
+      "id": 3,
+      "title": "MacOS Portfolio",
+      "description": "A portfolio website that is styled like a Mac OS. Features like Notes app, Terminal, Finder, and more are implemented with responsive design.",
+      "builtWith": "React JS",
+      "amount": "499",
+      "imageUrl": "/macos_portfolio.png",
+      "visitUrl": "https://caliber-macos-portfolio.netlify.app/",
+      "formUrl": "/users/Form3",
+      "steps": [
+        { "number": 1, "title": "USER DETAILS" },
+        { "number": 2, "title": "WEBSITES" },
+        { "number": 3, "title": "ABOUT ME" },
+        { "number": 4, "title": "NOTES" }
+      ]
     }
   ]
 }

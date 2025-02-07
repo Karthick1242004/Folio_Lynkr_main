@@ -28,11 +28,11 @@ export default function SiteScroller() {
                     <span className={`text-xl font-medium ${isDark ? 'text-gray-100' : 'text-white'}`}>
                       {site.title}
                     </span>
-                    <a 
-                      href={site.visitUrl} 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      onClick={(e) => e.stopPropagation()} 
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        window.open(site.visitUrl, '_blank', 'noopener,noreferrer');
+                      }}
                       className={`rounded-full p-2 transition-colors ${
                         isDark 
                           ? 'bg-gray-800 hover:bg-gray-700' 
@@ -42,7 +42,7 @@ export default function SiteScroller() {
                       <ArrowUpRight className={`w-5 h-5 ${
                         isDark ? 'text-gray-100' : 'text-gray-900'
                       }`} />
-                    </a>
+                    </button>
                   </div>
                 </div>
               </div>
