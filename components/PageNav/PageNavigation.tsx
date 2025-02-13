@@ -22,6 +22,12 @@ export const PageNavigation: React.FC<NavigationProps> = ({ isOpen, onClose }) =
     { text: 'CONTACT', isHighlight: false,link:'/' },
   ];
 
+  const handleOverlayClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   return (
     <>
       <header className="flex justify-between items-center sm:mb-header-spacing max-w-4xl mx-auto pt-3 px-3 max500:pt-5">
@@ -33,15 +39,18 @@ export const PageNavigation: React.FC<NavigationProps> = ({ isOpen, onClose }) =
         </div>
       </header>
 
-      <div className={`fixed inset-0 bg-gradient-to-b from-black/90 to-transparent dark:from-black/95 dark:to-transparent backdrop-blur-sm transform transition-transform duration-300 ${
-        isOpen ? 'translate-x-0' : '-translate-x-full'
-      } z-50`}>
-        <div className="flex justify-end p-6">
+      <div 
+        onClick={handleOverlayClick}
+        className={`fixed inset-0 bg-gradient-to-b from-black/90 to-transparent dark:from-black/95 dark:to-transparent backdrop-blur-sm transform transition-transform duration-300 ${
+          isOpen ? 'translate-x-0' : '-translate-x-full'
+        } z-50`}
+      >
+        <div className="flex justify-end p-6" onClick={e => e.stopPropagation()}>
           <button onClick={onClose} className="p-2" title="Close Navigation">
             <X className="w-8 h-8 text-white" />
           </button>
         </div>
-        <nav className="flex flex-col items-start px-8 sm:px-16 pt-8 sm:pt-12 space-y-4">
+        <nav className="flex flex-col items-start px-8 sm:px-16 pt-8 sm:pt-12 space-y-4" onClick={e => e.stopPropagation()}>
           {menuItems.map((item) => (
             <Link
               key={item.text}

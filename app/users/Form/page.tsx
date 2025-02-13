@@ -1,6 +1,6 @@
 // Form
 "use client"
-import React, { useState, FormEvent } from 'react';
+import React, { useState, FormEvent, useEffect } from 'react';
 import { useStore } from '@/store/store';
 import axios from 'axios';
 import ProgressBar from '@/components/ProgreseBar/ProgreseBar';
@@ -9,6 +9,7 @@ import { CldUploadWidget ,CloudinaryUploadWidgetResults} from 'next-cloudinary';
 import { useRouter } from 'next/navigation';
 import Payment from '@/components/Payment/Payment';
 import data from '@/Data/data.json';
+import { useSession, signIn } from 'next-auth/react'
 
 interface FormDataType {
   siteTitle: string;
@@ -58,6 +59,7 @@ interface FormDataType {
 }
 
 function Page() {
+  const { data: session } = useSession()
   const { subdomain, availability, loading, setSubdomain, setAvailability, setLoading, isPaymentComplete } = useStore();
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 7;
@@ -127,6 +129,11 @@ function Page() {
     });
   };
 
+  const site_name = 'Bento Portfolio';
+  
+  useEffect(() => {
+    console.log("name",site_name);
+  }, [site_name]);
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
@@ -147,6 +154,20 @@ function Page() {
       return;
     }
 
+    // Check if user is logged in
+    if (!session) {
+      signIn('google');
+      return;
+    }
+
+    const userId = session.user?.email;
+
+    if (!userId) {
+      console.error('User ID not found in session:', session);
+      alert('Authentication error. Please try logging in again.');
+      return;
+    }
+
     const data = {
       ...formData,
       subdomain,
@@ -156,22 +177,41 @@ function Page() {
       // Step 1: Create a new Gist
       const createGistResponse = await fetch("https://folio4ubackend-production.up.railway.app/create-gist", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content: JSON.stringify(data, null, 2) }),
       });
 
       if (!createGistResponse.ok) {
         const errorData = await createGistResponse.json();
-        console.error("Failed to create the Gist:", errorData);
         throw new Error(errorData.message || "Failed to create the Gist");
       }
 
       const { gistRawUrl } = await createGistResponse.json();
-      console.log("Gist created successfully:", gistRawUrl);
 
-      // Step 2: Update the Gist URL in the repository with repoName
+      // Step 2: Store user and site data with site name
+      const storePayload = {
+        userId: userId,
+        userEmail: session.user?.email,
+        userName: session.user?.name,
+        subdomain: subdomain,
+        gistUrl: gistRawUrl,
+        siteName: site_name  // Add the site name to the payload
+      };
+
+      console.log('Sending payload to store-hosted-site:', storePayload);
+
+      const storeResponse = await fetch("https://folio4ubackend-production.up.railway.app/store-hosted-site", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(storePayload),
+      });
+
+      if (!storeResponse.ok) {
+        const errorData = await storeResponse.json();
+        throw new Error(errorData.message || "Failed to store site information");
+      }
+
+      // Step 3: Update the Gist URL in the repository
       const updateGistUrlResponse = await fetch("https://folio4ubackend-production.up.railway.app/update-gist-url", {
         method: "POST",
         headers: {
@@ -180,17 +220,14 @@ function Page() {
         body: JSON.stringify({ 
           gistRawUrl, 
           subdomain,
-          repoName: formData.repo_name.repo // Send the repo name from formData
+          repoName: formData.repo_name.repo
         }),
       });
 
       if (!updateGistUrlResponse.ok) {
-        const errorData = await updateGistUrlResponse.json();
-        console.error("Failed to update the Gist URL:", errorData);
-        throw new Error(errorData.message || "Failed to update the Gist URL in the repository");
+        throw new Error("Failed to update the Gist URL");
       }
-      const successData = await updateGistUrlResponse.json();
-      console.log("Repository updated successfully:", successData);
+
       router.push('/users/pipeline');
       
     } catch (error) {
@@ -643,19 +680,32 @@ function Page() {
                       Next Step
                     </button>
                   ) : (
-                    <Payment 
-                      onSuccess={() => {
-                        // Create a synthetic form submit event
-                        const submitEvent = new Event('submit', {
-                          bubbles: true,
-                          cancelable: true,
-                        }) as unknown as FormEvent<HTMLFormElement>;
-                        
-                        // Call handleSubmit with a slight delay to ensure state is updated
-                        setTimeout(() => handleSubmit(submitEvent), 100);
-                      }} 
-                      amount={499}
-                    />
+                    <div className="flex flex-col gap-4">
+                      <Payment 
+                        onSuccess={() => {
+                          // Check subdomain and availability before proceeding
+                          if (!subdomain) {
+                            alert("Please enter a subdomain first");
+                            return;
+                          }
+                          if (!availability || !availability.includes("is available")) {
+                            alert("Please check subdomain availability first");
+                            return;
+                          }
+                          
+                          if (!session) {
+                            signIn('google');
+                            return;
+                          }
+                          const submitEvent = new Event('submit', {
+                            bubbles: true,
+                            cancelable: true,
+                          }) as unknown as FormEvent<HTMLFormElement>;
+                          setTimeout(() => handleSubmit(submitEvent), 100);
+                        }} 
+                        amount={499}
+                      />
+                    </div>
                   )}
                 </div>
               </form>

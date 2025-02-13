@@ -46,7 +46,7 @@ export function Landing() {
           />
           <div className="flex items-center gap-2 sm:gap-4">
             <ThemeToggle isDark={isDark} onToggle={toggleTheme} />
-            {/* <GoogleSignin /> */}
+            <GoogleSignin />
           </div>
         </header>
         <Navigation 

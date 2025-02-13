@@ -9,6 +9,7 @@ import { CldUploadWidget, CloudinaryUploadWidgetResults } from 'next-cloudinary'
 import { useRouter } from 'next/navigation';
 import Payment from '@/components/Payment/Payment';
 import data from '@/Data/data.json';
+import { useSession, signIn } from 'next-auth/react'
 
 interface FormDataType {
   projects: Array<{
@@ -63,6 +64,8 @@ function Page() {
   // Get the steps for the second site (3D Interactive Portfolio)
   const siteSteps = data.sites[1].steps;
   
+  const site_name = '3D Interactive Portfolio';
+  
   const [formData, setFormData] = useState<FormDataType>({
     projects: Array(3).fill(null).map(() => ({
       projectName: '',
@@ -109,6 +112,7 @@ function Page() {
   });
 
   const router = useRouter();
+  const { data: session } = useSession()
 
   // Reuse the same helper functions
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -138,6 +142,7 @@ function Page() {
       return;
     }
 
+    // Get the latest payment status directly from the store
     const { isPaymentComplete } = useStore.getState();
 
     if (!isPaymentComplete) {
@@ -150,34 +155,66 @@ function Page() {
       return;
     }
 
+    // Check if user is logged in
+    if (!session) {
+      signIn('google');
+      return;
+    }
+
+    // Get user ID from session
+    const userId = session.user?.email;
+
+    if (!userId) {
+      console.error('User ID not found in session:', session);
+      alert('Authentication error. Please try logging in again.');
+      return;
+    }
+
     const data = {
       ...formData,
       subdomain,
     };
 
     try {
+      // Step 1: Create Gist
       const createGistResponse = await fetch("https://folio4ubackend-production.up.railway.app/create-gist", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content: JSON.stringify(data, null, 2) }),
       });
 
       if (!createGistResponse.ok) {
         const errorData = await createGistResponse.json();
-        console.error("Failed to create the Gist:", errorData);
         throw new Error(errorData.message || "Failed to create the Gist");
       }
 
       const { gistRawUrl } = await createGistResponse.json();
-      console.log("Gist created successfully:", gistRawUrl);
 
+      // Step 2: Store user and site data with site name
+      const storePayload = {
+        userId: userId,
+        userEmail: session.user?.email,
+        userName: session.user?.name,
+        subdomain: subdomain,
+        gistUrl: gistRawUrl,
+        siteName: site_name
+      };
+
+      const storeResponse = await fetch("https://folio4ubackend-production.up.railway.app/store-hosted-site", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(storePayload),
+      });
+
+      if (!storeResponse.ok) {
+        const errorData = await storeResponse.json();
+        throw new Error(errorData.message || "Failed to store site information");
+      }
+
+      // Step 3: Update Gist URL
       const updateGistUrlResponse = await fetch("https://folio4ubackend-production.up.railway.app/update-gist-url", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
           gistRawUrl, 
           subdomain,
@@ -186,12 +223,9 @@ function Page() {
       });
 
       if (!updateGistUrlResponse.ok) {
-        const errorData = await updateGistUrlResponse.json();
-        console.error("Failed to update the Gist URL:", errorData);
-        throw new Error(errorData.message || "Failed to update the Gist URL in the repository");
+        throw new Error("Failed to update the Gist URL");
       }
-      const successData = await updateGistUrlResponse.json();
-      console.log("Repository updated successfully:", successData);
+
       router.push('/users/pipeline');
       
     } catch (error) {

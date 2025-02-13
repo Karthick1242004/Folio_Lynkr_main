@@ -4,16 +4,25 @@ import Image from "next/image"
 import { ArrowUpRight } from 'lucide-react'
 import data from '@/Data/data.json'
 import { useStore } from '@/store/store'
+import { useRouter } from 'next/navigation'
 
 export default function SiteScroller() {
   const isDark = useStore((state) => state.isDark)
+  const router = useRouter()
+
+  const handleSiteClick = (siteId: number) => {
+    window.location.href = `/users/site?id=${siteId}`
+  }
   
   return (
     <div className="flex flex-row gap-2 w-full px-4 py-4 max700:flex-col max700:gap-4 max700:items-center">
       {data.sites.map((site) => (
         <div key={site.id} className="flex flex-col gap-3 w-1/3 max700:w-full">
-          <Link href={`/users/site?id=${site.id}`} className={`group ${isDark ? 'border rounded-lg border-gray-600' : 'border rounded-lg border-gray-200'}`}>
-            <div className="relative w-full  overflow-hidden rounded-[8px]">
+          <div 
+            onClick={() => handleSiteClick(site.id)}
+            className={`group cursor-pointer ${isDark ? 'border rounded-lg border-gray-600' : 'border rounded-lg border-gray-200'}`}
+          >
+            <div className="relative w-full overflow-hidden rounded-[8px]">
               <div className="relative">
                 <Image 
                   src={site.imageUrl}
@@ -47,7 +56,7 @@ export default function SiteScroller() {
                 </div>
               </div>
             </div>
-          </Link>
+          </div>
         </div>
       ))}
     </div>

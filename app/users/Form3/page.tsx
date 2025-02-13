@@ -8,6 +8,7 @@ import { CldUploadWidget, CloudinaryUploadWidgetResults } from 'next-cloudinary'
 import { useRouter } from 'next/navigation';
 import Payment from '@/components/Payment/Payment';
 import data from '@/Data/data.json';
+import { useSession, signIn } from 'next-auth/react'
 
 interface UserProfileData {
   name: string;
@@ -135,6 +136,8 @@ function Page() {
 
   const router = useRouter();
   const siteSteps = data.sites[2].steps;
+  const { data: session } = useSession()
+  const site_name = 'MacOS Portfolio';
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -178,6 +181,19 @@ function Page() {
       return;
     }
 
+    if (!session) {
+      signIn('google');
+      return;
+    }
+
+    const userId = session.user?.email;
+
+    if (!userId) {
+      console.error('User ID not found in session:', session);
+      alert('Authentication error. Please try logging in again.');
+      return;
+    }
+
     const data = {
       ...formData,
       subdomain,
@@ -186,9 +202,7 @@ function Page() {
     try {
       const createGistResponse = await fetch("https://folio4ubackend-production.up.railway.app/create-gist", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content: JSON.stringify(data, null, 2) }),
       });
 
@@ -199,11 +213,29 @@ function Page() {
 
       const { gistRawUrl } = await createGistResponse.json();
 
+      const storePayload = {
+        userId: userId,
+        userEmail: session.user?.email,
+        userName: session.user?.name,
+        subdomain: subdomain,
+        gistUrl: gistRawUrl,
+        siteName: site_name
+      };
+
+      const storeResponse = await fetch("https://folio4ubackend-production.up.railway.app/store-hosted-site", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(storePayload),
+      });
+
+      if (!storeResponse.ok) {
+        const errorData = await storeResponse.json();
+        throw new Error(errorData.message || "Failed to store site information");
+      }
+
       const updateGistUrlResponse = await fetch("https://folio4ubackend-production.up.railway.app/update-gist-url", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
           gistRawUrl, 
           subdomain,
@@ -212,8 +244,7 @@ function Page() {
       });
 
       if (!updateGistUrlResponse.ok) {
-        const errorData = await updateGistUrlResponse.json();
-        throw new Error(errorData.message || "Failed to update the Gist URL");
+        throw new Error("Failed to update the Gist URL");
       }
 
       router.push('/users/pipeline');

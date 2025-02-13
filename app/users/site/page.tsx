@@ -7,23 +7,84 @@ import Image from "next/image"
 import { PageNavigation } from '@/components/PageNav/PageNavigation'
 import { useStore } from '@/store/store'
 import { useSearchParams } from 'next/navigation'
+import { useSession, signIn } from 'next-auth/react'
 
 export default function Page() {
   const [isLiked, setIsLiked] = useState(false)
+  const [likeCount, setLikeCount] = useState(0)
   const searchParams = useSearchParams()
   const siteId = searchParams.get('id')
   const [currentSite, setCurrentSite] = useState(siteData.sites[0])
   const { isNavOpen, setIsNavOpen } = useStore()
   const isDark = useStore((state) => state.isDark)
+  const { data: session } = useSession()
 
   useEffect(() => {
     if (siteId) {
       const site = siteData.sites.find(site => site.id === parseInt(siteId))
       if (site) {
         setCurrentSite(site)
+        setIsLiked(false)
+        setLikeCount(0)
       }
     }
   }, [siteId])
+
+  useEffect(() => {
+    const fetchLikeStatus = async () => {
+      if (currentSite?.title) {
+        try {
+          const response = await fetch(
+            `https://folio4ubackend-production.up.railway.app/get-likes/${encodeURIComponent(currentSite.title)}?userId=${session?.user?.email || ''}`,
+            { method: 'GET' }
+          );
+          const data = await response.json();
+          setIsLiked(data.isLiked);
+          setLikeCount(data.likeCount);
+        } catch (error) {
+          console.error('Error fetching like status:', error);
+        }
+      }
+    };
+
+    fetchLikeStatus();
+  }, [currentSite.title, session]);
+
+  const handleMakeItYours = (e: React.MouseEvent) => {
+    e.preventDefault()
+    if (!session) {
+      signIn('google')
+    } else {
+      window.location.href = currentSite.formUrl
+    }
+  }
+
+  const handleLike = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    if (!session) {
+      signIn('google')
+      return
+    }
+
+    try {
+      const response = await fetch('https://folio4ubackend-production.up.railway.app/toggle-like', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          siteName: currentSite.title,
+          userId: session.user?.email
+        }),
+      });
+
+      const data = await response.json();
+      setIsLiked(data.isLiked);
+      setLikeCount(data.likeCount);
+    } catch (error) {
+      console.error('Error toggling like:', error);
+    }
+  }
 
   return (
     <div className={`${isDark ? 'bg-[#121212]' : 'bg-[#F0F0F0]'}`}>
@@ -64,10 +125,10 @@ export default function Page() {
                       ? 'hover:bg-gray-800 text-gray-200' 
                       : 'hover:bg-gray-100 text-gray-700'
                 }`} 
-                onClick={()=>setIsLiked(!isLiked)}
+                onClick={handleLike}
               >
                 <Heart className={`w-4 h-4 ${isLiked ? 'fill-white' : ''}`} />
-                {isLiked ? 'Liked' : 'Like'} {isLiked ? 1 : null}
+                {isLiked ? 'Liked' : 'Like'} {likeCount > 0 ? likeCount : null}
               </button>
               <Link
                 href={currentSite.visitUrl}
@@ -114,11 +175,15 @@ export default function Page() {
             } flex-1 max500:!text-[12px]`}>
               Make this site yours by filling out the form. Press the button to start filling out the form, once you have filled out the form, provide your desired domain name in the provided field.
             </p>
-            <Link href={currentSite.formUrl} className={`${
-              isDark 
-                ? 'bg-blue-500 hover:bg-blue-600' 
-                : 'bg-blue-600 hover:bg-blue-700'
-            } text-white px-4 py-2 rounded-full text-sm whitespace-nowrap transition-colors max500:px-3 max500:py-2 max500:text-[12px]`}>
+            <Link 
+              href="#" 
+              onClick={handleMakeItYours} 
+              className={`${
+                isDark 
+                  ? 'bg-blue-500 hover:bg-blue-600' 
+                  : 'bg-blue-600 hover:bg-blue-700'
+              } text-white px-6 py-3 rounded-full text-sm whitespace-nowrap transition-colors max500:px-3 max500:py-2 max500:text-[12px]`}
+            >
               Make it yours
             </Link>
           </div>
