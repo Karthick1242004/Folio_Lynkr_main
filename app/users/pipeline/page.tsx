@@ -9,6 +9,7 @@ import { useStore } from "@/store/store"
 import confetti from 'canvas-confetti'
 import axios from 'axios'
 import { useEffect } from "react"
+import Footer from "@/components/Footer/Footer"
 
 interface Step {
   name: string
@@ -329,6 +330,7 @@ export default function Page() {
         </AnimatePresence>
       </div>
       </div>
+      <Footer />
     </div>
   )
 }

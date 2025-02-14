@@ -10,6 +10,8 @@ import { useRouter } from 'next/navigation';
 import Payment from '@/components/Payment/Payment';
 import data from '@/Data/data.json';
 import { useSession, signIn } from 'next-auth/react'
+import Footer from '@/components/FormFooter/Footer';
+import { PageNavigation } from '@/components/FormpageNav/PageNavigation';
 
 interface FormDataType {
   projects: Array<{
@@ -59,6 +61,7 @@ interface FormDataType {
 function Page() {
   const { subdomain, availability, loading, setSubdomain, setAvailability, setLoading, isPaymentComplete } = useStore();
   const [currentStep, setCurrentStep] = useState(1);
+  const [isNavOpen, setIsNavOpen] = useState(false);
   const totalSteps = 8;
   
   // Get the steps for the second site (3D Interactive Portfolio)
@@ -621,7 +624,11 @@ function Page() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+    <div className="min-h-screen bg-[#F0F0F0] p-4 md:p-8">
+      <PageNavigation
+        isOpen={isNavOpen} 
+        onClose={() => setIsNavOpen(false)} 
+      />
       <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-lg p-4 md:p-8">
         <div className="flex flex-col md:flex-row gap-8">
           <ProgressBar 
@@ -688,6 +695,7 @@ function Page() {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

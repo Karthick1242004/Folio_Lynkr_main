@@ -8,6 +8,7 @@ import { PageNavigation } from '@/components/PageNav/PageNavigation'
 import { useStore } from '@/store/store'
 import { useSearchParams } from 'next/navigation'
 import { useSession, signIn } from 'next-auth/react'
+import Footer from "@/components/Footer/Footer"
 
 export default function Page() {
   const [isLiked, setIsLiked] = useState(false)
@@ -189,6 +190,7 @@ export default function Page() {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   )
 }

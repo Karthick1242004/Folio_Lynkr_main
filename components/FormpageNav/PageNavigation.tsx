@@ -31,7 +31,7 @@ export const PageNavigation: React.FC<NavigationProps> = ({ isOpen, onClose }) =
 
   return (
     <>
-      <header className="flex justify-between items-center sm:mb-header-spacing max-w-4xl mx-auto pt-3 px-3 max500:pt-5">
+      <header className="flex justify-between items-center sm:mb-header-spacing max-w-6xl mx-auto pt-3 px-3 max500:pt-5">
         <button className="p-1 sm:p-2" onClick={() => setIsNavOpen(true)} title="Menu">
           <RiMenu2Line size={window.innerWidth <= 500 ? 30 : 38} color={isDark ? "#9CA3AF" : "#9CA3AF"} />
         </button>

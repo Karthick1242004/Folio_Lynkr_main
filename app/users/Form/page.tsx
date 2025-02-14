@@ -10,6 +10,9 @@ import { useRouter } from 'next/navigation';
 import Payment from '@/components/Payment/Payment';
 import data from '@/Data/data.json';
 import { useSession, signIn } from 'next-auth/react'
+import Footer from '@/components/FormFooter/Footer';
+import { PageNavigation } from '@/components/FormpageNav/PageNavigation';
+
 
 interface FormDataType {
   siteTitle: string;
@@ -62,6 +65,7 @@ function Page() {
   const { data: session } = useSession()
   const { subdomain, availability, loading, setSubdomain, setAvailability, setLoading, isPaymentComplete } = useStore();
   const [currentStep, setCurrentStep] = useState(1);
+  const [isNavOpen, setIsNavOpen] = useState(false);
   const totalSteps = 7;
   const [formData, setFormData] = useState<FormDataType>({
     siteTitle: '',
@@ -607,7 +611,11 @@ function Page() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+    <div className="min-h-screen bg-[#F0F0F0] p-4 md:p-8">
+      <PageNavigation
+        isOpen={isNavOpen} 
+        onClose={() => setIsNavOpen(false)} 
+      />
       <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-lg p-4 md:p-8">
         <div className="flex flex-col md:flex-row gap-8">
           <ProgressBar 
@@ -713,6 +721,7 @@ function Page() {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

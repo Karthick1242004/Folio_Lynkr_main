@@ -74,17 +74,18 @@ export function GoogleSignin() {
                 </div>
               </div>
               <div className="border-t border-gray-200 dark:border-gray-700">
+              <Link href='/users/account'>
+                <button className="w-[100%] text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700">
+                  Manage your account
+                </button>
+                </Link>
                 <button 
                   onClick={() => signOut()}
                   className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
                 >
                   Sign out
                 </button>
-                <Link href='/users/account'>
-                <button className="w-[100%] text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700">
-                  Manage your account
-                </button>
-                </Link>
+                
               </div>
             </div>
           )}
