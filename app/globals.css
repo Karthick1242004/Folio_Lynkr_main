@@ -14,6 +14,16 @@
   font-family: 'Big Shoulders Display', sans-serif;
   letter-spacing: -0.02em;
 }
+.name-text-main{
+  font-family: 'Big Shoulders Display', sans-serif;
+  letter-spacing: -0.02em;
+}
+
+@media (max-width: 500px) {
+  .name-text-main {
+    font-size: 60px;
+  }
+}
 
 .description-text .fontcss {
   font-family: 'DM Sans', sans-serif;

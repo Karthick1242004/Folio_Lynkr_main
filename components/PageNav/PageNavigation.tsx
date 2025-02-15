@@ -17,10 +17,10 @@ export const PageNavigation: React.FC<NavigationProps> = ({ isOpen, onClose }) =
   
   const menuItems = [
     { text: 'HOME', isHighlight: true,link:'/' },
-    { text: 'ABOUT', isHighlight: false,link:'/' },
-    { text: 'PROJECTS', isHighlight: false,link:'/' },
-    { text: 'EXPERIENCE', isHighlight: false,link:'/' },
-    { text: 'CONTACT', isHighlight: false,link:'/' },
+    { text: 'ABOUT US', isHighlight: false,link:'/users/aboutus' },
+    { text: 'TERMS & CONDITIONS', isHighlight: false,link:'/users/Terms' },
+    { text: 'REFUND POLICY', isHighlight: false,link:'/users/Cancel' },
+    { text: 'CONTACT US', isHighlight: false,link:'/' },
   ];
 
   const handleOverlayClick = (e: React.MouseEvent) => {
