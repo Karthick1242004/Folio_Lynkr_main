@@ -20,7 +20,7 @@ export const PageNavigation: React.FC<NavigationProps> = ({ isOpen, onClose }) =
     { text: 'ABOUT US', isHighlight: false,link:'/users/aboutus' },
     { text: 'TERMS & CONDITIONS', isHighlight: false,link:'/users/Terms' },
     { text: 'REFUND POLICY', isHighlight: false,link:'/users/Cancel' },
-    { text: 'CONTACT US', isHighlight: false,link:'/' },
+    { text: 'CONTACT US', isHighlight: false,link:'/users/contactus' },
   ];
 
   const handleOverlayClick = (e: React.MouseEvent) => {
