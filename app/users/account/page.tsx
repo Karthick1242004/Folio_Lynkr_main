@@ -28,18 +28,23 @@ export default function AccountPage() {
 
   useEffect(() => {
     const fetchUserSites = async () => {
-      if (session?.user?.email) {
+      if (session?.user?.name) {
         try {
-          const response = await fetch(`https://folio4ubackend-production.up.railway.app/get-user-sites/${session.user.email}`);
+          const response = await fetch(`https://folio4ubackend-production.up.railway.app/get-user-sites/${session.user.name}`);
           const data = await response.json();
           
           if (response.ok) {
             const transformedSites = data.sites.map((site: HostedSite) => ({
               ...site,
-              gistUrl: site.gistUrl.replace('githubusercontent.com', 'github.com').replace('/raw/data.json', '')
+              gistUrl: site.gistUrl
+                .split('/raw/')[0]
+                .replace('githubusercontent.com', 'github.com')
             }));
             setSites(transformedSites);
-            setUserData(data.userData);
+            setUserData({
+              name: session.user.name,
+              email: session.user.email || `${session.user.name}@github.com`
+            });
           }
         } catch (error) {
           console.error('Failed to fetch sites:', error);

@@ -185,18 +185,13 @@ function Page() {
       return;
     }
 
-    if (!session) {
-      signIn('google');
+    if (!session?.user?.name) {
+      signIn('github');
       return;
     }
 
-    const userId = session.user?.email;
-
-    if (!userId) {
-      console.error('User ID not found in session:', session);
-      alert('Authentication error. Please try logging in again.');
-      return;
-    }
+    const userId = session.user.name;
+    const userEmail = session.user?.email || `${session.user.name}@github.com`;
 
     const data = {
       ...formData,
@@ -204,10 +199,21 @@ function Page() {
     };
 
     try {
+      const userToken = (session as any)?.accessToken;
+
+      if (!userToken) {
+        console.error('GitHub token not found in session');
+        alert('Authentication error. Please try logging in again.');
+        return;
+      }
+
       const createGistResponse = await fetch("https://folio4ubackend-production.up.railway.app/create-gist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: JSON.stringify(data, null, 2) }),
+        body: JSON.stringify({ 
+          content: JSON.stringify(data, null, 2),
+          userToken: userToken
+        }),
       });
 
       if (!createGistResponse.ok) {
@@ -219,8 +225,8 @@ function Page() {
 
       const storePayload = {
         userId: userId,
-        userEmail: session.user?.email,
-        userName: session.user?.name,
+        userEmail: userEmail,
+        userName: session.user.name,
         subdomain: subdomain,
         gistUrl: gistRawUrl,
         siteName: site_name

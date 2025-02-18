@@ -115,7 +115,7 @@ function Page() {
   });
 
   const router = useRouter();
-  const { data: session } = useSession()
+  const { data: session } = useSession();
 
   // Reuse the same helper functions
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -145,7 +145,6 @@ function Page() {
       return;
     }
 
-    // Get the latest payment status directly from the store
     const { isPaymentComplete } = useStore.getState();
 
     if (!isPaymentComplete) {
@@ -159,19 +158,14 @@ function Page() {
     }
 
     // Check if user is logged in
-    if (!session) {
-      signIn('google');
+    if (!session?.user?.name) {
+      signIn('github');
       return;
     }
 
-    // Get user ID from session
-    const userId = session.user?.email;
-
-    if (!userId) {
-      console.error('User ID not found in session:', session);
-      alert('Authentication error. Please try logging in again.');
-      return;
-    }
+    // Use GitHub username and fallback email
+    const userId = session.user.name;
+    const userEmail = session.user?.email || `${session.user.name}@github.com`;
 
     const data = {
       ...formData,
@@ -179,11 +173,23 @@ function Page() {
     };
 
     try {
-      // Step 1: Create Gist
+      // Get GitHub token from session
+      const userToken = (session as any)?.accessToken;
+
+      if (!userToken) {
+        console.error('GitHub token not found in session');
+        alert('Authentication error. Please try logging in again.');
+        return;
+      }
+
+      // Create Gist with token
       const createGistResponse = await fetch("https://folio4ubackend-production.up.railway.app/create-gist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: JSON.stringify(data, null, 2) }),
+        body: JSON.stringify({ 
+          content: JSON.stringify(data, null, 2),
+          userToken: userToken
+        }),
       });
 
       if (!createGistResponse.ok) {
@@ -193,11 +199,10 @@ function Page() {
 
       const { gistRawUrl } = await createGistResponse.json();
 
-      // Step 2: Store user and site data with site name
       const storePayload = {
         userId: userId,
-        userEmail: session.user?.email,
-        userName: session.user?.name,
+        userEmail: userEmail,
+        userName: session.user.name,
         subdomain: subdomain,
         gistUrl: gistRawUrl,
         siteName: site_name
@@ -214,10 +219,12 @@ function Page() {
         throw new Error(errorData.message || "Failed to store site information");
       }
 
-      // Step 3: Update Gist URL
+      // Added: Update the Gist URL in the repository
       const updateGistUrlResponse = await fetch("https://folio4ubackend-production.up.railway.app/update-gist-url", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({ 
           gistRawUrl, 
           subdomain,

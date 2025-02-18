@@ -11,7 +11,7 @@ import Darklogo from "../../assets/33.png";
 import Dark from "../../assets/3.png";
 import Lightlogo from "../../assets/44.png";
 import Light from "../../assets/4.png";
-import { GoogleSignin } from '../GoogleSignin/Signin';
+import { GoogleSignin } from '../GithubSignIn/Signin';
 import { useState, useRef, useEffect } from 'react';
 
 export function Landing() {
@@ -41,8 +41,8 @@ export function Landing() {
             src={isDark ? Darklogo : Lightlogo} 
             alt="Folio Lynkr" 
             className='w-logo-sm h-logo-sm sm:w-logo-lg sm:h-logo-lg ml-10 sm:ml-8'
-            width={150}
-            height={150}
+            width={100}
+            height={100}
           />
           <div className="flex items-center gap-2 sm:gap-4">
             <ThemeToggle isDark={isDark} onToggle={toggleTheme} />
@@ -61,7 +61,7 @@ export function Landing() {
           </p> 
           
           <div className="relative mb-0 sm:mb-0">
-            <h1 className={`name-text text-heading-md md:text-heading-lg lg:text-heading-lg leading-none font-black ${
+            <h1 className={`name-text max500:text-9xl text-heading-md md:text-heading-lg lg:text-heading-lg leading-none font-black ${
               isDark ? 'text-[#E0F01F]' : 'text-[#1F67F0]'
             }`}>
               FOLIO
@@ -87,6 +87,7 @@ export function Landing() {
               <br className="hidden sm:block" /> the site is ready and hosted 
             </div>
           </div>
+          <p className=' text-gray-500 text-[10px] mt-6 font-normal dark:text-gray-400 p-2 fontcss tracking-widest flex text-center mx-auto gap-2'>Scroll Down</p>
           <div className='absolute bottom-0'>
            <p className="text-gray-500 text-[10px] font-normal dark:text-gray-400 p-2 fontcss tracking-widest flex items-center gap-2">
             Powered by <a href='https://calibertech.vercel.app/'><span className={`font-medium text-black ${isDark ? 'text-gray-400' : 'text-black'}`}>@CaliberTech</span></a>

@@ -160,11 +160,17 @@ function Page() {
 
     // Check if user is logged in
     if (!session) {
-      signIn('google');
+      signIn('github');
       return;
     }
 
-    const userId = session.user?.email;
+    if (!session?.user?.name) {
+      console.error('User name not found in session:', session);
+      alert('Authentication error. Please try logging in again.');
+      return;
+    }
+
+    const userId = session.user.name;
 
     if (!userId) {
       console.error('User ID not found in session:', session);
@@ -172,17 +178,32 @@ function Page() {
       return;
     }
 
+    // If email is missing, use a default format
+    const userEmail = session.user?.email || `${session.user.name}@github.com`;
+
     const data = {
       ...formData,
       subdomain,
     };
 
     try {
-      // Step 1: Create a new Gist
-      const createGistResponse = await fetch("https://folio4ubackend-production.up.railway.app/create-gist", {
+      // Get the GitHub access token from the session
+      const userToken = (session as any)?.accessToken;
+
+      if (!userToken) {
+        console.error('GitHub token not found in session');
+        alert('Authentication error. Please try logging in again.');
+        return;
+      }
+
+      // Step 1: Create a new Gist with the token
+      const createGistResponse = await fetch("http://localhost:5001/create-gist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: JSON.stringify(data, null, 2) }),
+        body: JSON.stringify({ 
+          content: JSON.stringify(data, null, 2),
+          userToken: userToken
+        }),
       });
 
       if (!createGistResponse.ok) {
@@ -195,11 +216,11 @@ function Page() {
       // Step 2: Store user and site data with site name
       const storePayload = {
         userId: userId,
-        userEmail: session.user?.email,
-        userName: session.user?.name,
+        userEmail: userEmail,
+        userName: session.user.name,
         subdomain: subdomain,
         gistUrl: gistRawUrl,
-        siteName: site_name  // Add the site name to the payload
+        siteName: site_name
       };
 
       console.log('Sending payload to store-hosted-site:', storePayload);
@@ -702,7 +723,7 @@ function Page() {
                           }
                           
                           if (!session) {
-                            signIn('google');
+                            signIn('github');
                             return;
                           }
                           const submitEvent = new Event('submit', {

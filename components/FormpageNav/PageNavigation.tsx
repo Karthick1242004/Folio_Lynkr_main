@@ -4,7 +4,7 @@ import { RiMenu2Line } from 'react-icons/ri';
 import { ThemeToggle } from '../ThemeToggle';
 import { useStore } from '@/store/store';
 import Link from 'next/link';
-import { GoogleSignin } from '../GoogleSignin/Signin';
+import { GoogleSignin } from '../GithubSignIn/Signin';
 
 
 interface NavigationProps {
