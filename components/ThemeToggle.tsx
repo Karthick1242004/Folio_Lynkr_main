@@ -1,16 +1,14 @@
 import React from 'react';
 import { Moon, Sun } from 'lucide-react';
+import { useStore } from '../store/store';
 
-interface ThemeToggleProps {
-  isDark: boolean;
-  onToggle: () => void;
-}
+export const ThemeToggle: React.FC = () => {
+  const { isDark, toggleTheme } = useStore();
 
-export const ThemeToggle: React.FC<ThemeToggleProps> = ({ isDark, onToggle }) => {
   return (
     <button
-      onClick={onToggle}
-      className={`flex items-center gap-2 rounded-full  ${isDark ? 'bg-gray-800' : 'bg-gray-200'} p-2 transition-colors`}
+      onClick={toggleTheme}
+      className={`flex items-center gap-2 rounded-full ${isDark ? 'bg-gray-800' : 'bg-gray-200'} p-2 transition-colors`}
     >
       <div className={`relative w-12 h-6 rounded-full  ${isDark ? 'bg-gray-700' : 'bg-gray-300'}`}>
         <div

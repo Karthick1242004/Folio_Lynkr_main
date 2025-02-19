@@ -1,19 +1,21 @@
 import React from 'react';
 import { X } from 'lucide-react';
+import { useStore } from '../../store/store';
 
 interface NavigationProps {
   isOpen: boolean;
   onClose: () => void;
-  isDark: boolean;
 }
 
-export const Navigation: React.FC<NavigationProps> = ({ isOpen, onClose, isDark }) => {
+export const Navigation: React.FC<NavigationProps> = ({ isOpen, onClose }) => {
+  const { isDark } = useStore();
   const menuItems = [
     { text: 'HOME', isHighlight: true,link:'/' },
     { text: 'ABOUT US', isHighlight: false,link:'/users/aboutus' },
     { text: 'TERMS & CONDITIONS', isHighlight: false,link:'/users/Terms' },
     { text: 'REFUND POLICY', isHighlight: false,link:'/users/Cancel' },
     { text: 'CONTACT US', isHighlight: false,link:'/users/contactus' },
+    { text: 'REFUND PORTAL', isHighlight: false,link:'/users/refundPortal' },
   ];
 
   const handleOverlayClick = (e: React.MouseEvent) => {

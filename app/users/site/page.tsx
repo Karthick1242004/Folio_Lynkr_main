@@ -16,8 +16,7 @@ export default function Page() {
   const searchParams = useSearchParams()
   const siteId = searchParams.get('id')
   const [currentSite, setCurrentSite] = useState(siteData.sites[0])
-  const { isNavOpen, setIsNavOpen } = useStore()
-  const isDark = useStore((state) => state.isDark)
+  const { isNavOpen, setIsNavOpen, isDark } = useStore()
   const { data: session } = useSession()
 
   useEffect(() => {

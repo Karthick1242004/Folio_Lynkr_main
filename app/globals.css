@@ -32,10 +32,12 @@
 .fontcss{
   font-family: 'DM Sans';
 }
-html ,body{
+
+body{
   -webkit-overscroll-behavior: none !important;
   overscroll-behavior: none !important;
 }
+
 @layer base {
   :root {
     --background: 0 0% 100%;

@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { PageNavigation } from '@/components/FormpageNav/PageNavigation';
 import { useStore } from '@/store/store';
 import { motion } from 'framer-motion';
@@ -12,13 +12,15 @@ export default function AboutUs() {
 
   const teamMembers = [
     {
-      name: 'John Doe',
+      name: 'Karthickrajan S',
       role: 'Founder & CEO',
-      image: '/team/member1.jpg',
-      description: 'Visionary leader with 10+ years of experience in tech.',
+      image: 'https://lh3.googleusercontent.com/a/ACg8ocJHDSb5qu1_j2GNbR1AQqKQzgsVpTSbqS3xefSA9PBC-L3o99uh=s576-c-no',
+      description: 'A guy trying to do better',
     },
-    // Add more team members
   ];
+  useEffect(()=>{
+    setIsNavOpen(false);
+  },[])
 
   return (
     <div className={`min-h-screen transition-colors duration-300 ${isDark ? 'dark bg-[#121212]' : 'bg-[#F0F0F0]'}`}>
@@ -40,17 +42,19 @@ export default function AboutUs() {
         }`}>
           ABOUT US
         </h1>
-        <p className={`description-text text-body-base font-light leading-relaxed ${
+        <p className={`description-text mt-6 text-body-base font-light leading-relaxed ${
           isDark ? 'text-white/80' : 'text-black/80'
         }`}>
-          We're building the future of web development,
-          <br className="hidden sm:block" />
-          making it accessible and elegant for everyone.
+          We're building the future of web development,making it accessible and elegant for everyone.
+          This unique platform is designed to help you create stunning
+          portfolios that showcase your skills and achievements.
+          Select from a range of templates and customize them to your liking.
+          Share your portfolio with potential employers or clients.
         </p>
       </motion.section>
 
       {/* Values Section */}
-      <section className={`py-16 ${isDark ? 'bg-[#1A1A1A]' : 'bg-[#E8E8E8]'}`}>
+      {/* <section className={`py-16 ${isDark ? 'bg-[#1A1A1A]' : 'bg-[#E8E8E8]'}`}>
         <div className="max-w-4xl mx-auto px-4">
           <motion.div 
             initial={{ opacity: 0 }}
@@ -73,13 +77,13 @@ export default function AboutUs() {
                   {value}
                 </h3>
                 <p className={`description-text ${isDark ? 'text-white/80' : 'text-black/80'}`}>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                  
                 </p>
               </div>
             ))}
           </motion.div>
         </div>
-      </section>
+      </section> */}
 
       {/* Team Section */}
       <section className="py-16">
@@ -89,7 +93,7 @@ export default function AboutUs() {
           }`}>
             OUR TEAM
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="flex justify-center flex-wrap flex-row gap-8 mt-6">
             {teamMembers.map((member, index) => (
               <motion.div
                 key={member.name}

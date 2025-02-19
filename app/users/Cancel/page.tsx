@@ -1,31 +1,26 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { PageNavigation } from '@/components/FormpageNav/PageNavigation';
 import { useStore } from '@/store/store';
 import { motion } from 'framer-motion';
 import { Clock, RefreshCcw, CreditCard, AlertCircle } from 'lucide-react';
+import Link from 'next/link';
 
 export default function CancellationPolicy() {
   const { isDark, isNavOpen, setIsNavOpen } = useStore();
 
   const policies = [
-    {
-      title: 'Cancellation Policy',
-      icon: <RefreshCcw className="w-6 h-6 mb-4" />,
-      content: [
-        'You can cancel your subscription at any time through your account settings.',
-        'Cancellation will take effect at the end of your current billing period.',
-        'You will retain access to all features until the end of your paid period.'
-      ]
-    },
+    
     {
       title: 'Refund Policy',
       icon: <CreditCard className="w-6 h-6 mb-4" />,
       content: [
-        'We offer a 14-day money-back guarantee for new subscriptions.',
-        'Refunds are processed within 5-7 business days.',
-        'Partial refunds may be available for annual subscriptions.'
+        'If your website is hosted on our platform, you are eligible for a refund within 30 days of purchase.',
+        'If any issues arise during payment and you are charged twice, we will refund the extra charge.',
+        'If money is deducted from your account and the payment fails, the amount will be refunded within 1-2 business days.',
+        'If the payment is successful but the website is not hosted, the amount will be refunded within 1-2 business days.',
+        'For any other issues, please contact our support team.'
       ]
     },
     {
@@ -33,15 +28,17 @@ export default function CancellationPolicy() {
       icon: <AlertCircle className="w-6 h-6 mb-4" />,
       content: [
         'Refund requests must be submitted through our support system.',
-        'Custom domain and add-on purchases are non-refundable.',
-        'We reserve the right to deny refunds in cases of policy abuse.'
+        'Provide the detailed reason for the refund request in the system.',
+        'If not ,mail us and we will get back to you within 24 hours.',
       ]
     }
   ];
-
+  useEffect(()=>{
+    setIsNavOpen(false);
+  },[])
   return (
     <div className={`min-h-screen transition-colors duration-300 ${isDark ? 'dark bg-[#121212]' : 'bg-[#F0F0F0]'}`}>
-      <PageNavigation isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />
+      <PageNavigation isOpen={isNavOpen} onClose={() => setIsNavOpen(true)} />
       
       {/* Hero Section */}
       <motion.section 
@@ -126,13 +123,13 @@ export default function CancellationPolicy() {
             }`}>
               Our support team is here to assist you with cancellations and refunds
             </p>
-            <button className={`px-8 py-3 rounded-full border ${
+            <Link href='/users/contactus'   className={`px-8 py-3 rounded-full border ${
               isDark 
                 ? 'border-[#E0F01F] text-[#E0F01F] hover:bg-[#E0F01F] hover:text-black' 
                 : 'border-[#1F67F0] text-[#1F67F0] hover:bg-[#1F67F0] hover:text-white'
             } transition-all duration-300`}>
               Contact Support
-            </button>
+            </Link>
           </motion.div>
         </div>
         <div className='text-center mt-16'>

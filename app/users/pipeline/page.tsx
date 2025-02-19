@@ -210,7 +210,9 @@ export default function Page() {
     }
     return "0s"
   }
-
+  useEffect(()=>{
+    setIsNavOpen(false);
+  },[])
   return (
     <div className={`w-full pb-10 mx-auto px-6 ${isDark ? 'bg-[#121212]' : 'bg-[#F0F0F0]'}`}>
       <PageNavigation 

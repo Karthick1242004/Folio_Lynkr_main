@@ -5,7 +5,7 @@
 }
 
 .loader path {
-  stroke: #000;
+  stroke: #626262;
   stroke-width: 0.6px;
   animation: dashArray 4s ease-in-out infinite,
     dashOffset 4s linear infinite;

@@ -21,6 +21,7 @@ export const PageNavigation: React.FC<NavigationProps> = ({ isOpen, onClose }) =
     { text: 'TERMS & CONDITIONS', isHighlight: false,link:'/users/Terms' },
     { text: 'REFUND POLICY', isHighlight: false,link:'/users/Cancel' },
     { text: 'CONTACT US', isHighlight: false,link:'/users/contactus' },
+    { text: 'REFUND PORTAL', isHighlight: false,link:'/users/refundPortal' },
   ];
 
   const handleOverlayClick = (e: React.MouseEvent) => {
@@ -36,7 +37,7 @@ export const PageNavigation: React.FC<NavigationProps> = ({ isOpen, onClose }) =
           <RiMenu2Line size={window.innerWidth <= 500 ? 30 : 38} color={isDark ? "#9CA3AF" : "#9CA3AF"} />
         </button>
         <div className="flex items-center gap-2 sm:gap-4">
-          <ThemeToggle isDark={isDark} onToggle={toggleTheme} />
+          <ThemeToggle />
           <GoogleSignin />
         </div>
       </header>

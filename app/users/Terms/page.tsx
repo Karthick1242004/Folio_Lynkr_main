@@ -1,10 +1,11 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { PageNavigation } from '@/components/FormpageNav/PageNavigation';
 import { useStore } from '@/store/store';
 import { motion } from 'framer-motion';
 import { Clock, Shield, FileText, Lock } from 'lucide-react';
+import Link from 'next/link';
 
 export default function Terms() {
   const { isDark, isNavOpen, setIsNavOpen } = useStore();
@@ -15,17 +16,20 @@ export default function Terms() {
       icon: <FileText className="w-6 h-6 mb-4" />,
       content: [
         'By accessing and using Folio Lynkr, you agree to comply with these Terms and Conditions.',
-        'You must be at least 18 years old to use our services.',
-        'You are responsible for maintaining the security of your account credentials.'
+        'You must be use Folio Lynkr for creating portfolio and not for any other purpose.',
+        'You must not use Folio Lynkr for any illegal or unauthorized purpose.',
+        'You must not use Folio Lynkr for any purpose that is harmful or harmful to the website or any other users.'
       ]
     },
     {
       title: 'Privacy Policy',
       icon: <Lock className="w-6 h-6 mb-4" />,
       content: [
-        'We collect and process personal data in accordance with our Privacy Policy.',
-        'Your data is encrypted and stored securely.',
-        'We do not share your personal information with third parties without consent.'
+        'We collect your github profile data to create your portfolio.',
+        'Your data is encrypted and stored securely and we do not store your github auth token.',
+        'We do not share your personal information with third parties without consent.',
+        'We do not sell your data to third parties or any purpose other than creating your portfolio.',
+        'We only get your public data from github and your github auth token which you authorize to use when signing in.',
       ]
     },
     {
@@ -38,7 +42,9 @@ export default function Terms() {
       ]
     }
   ];
-
+  useEffect(()=>{
+    setIsNavOpen(false);
+  },[])
   return (
     <div className={`min-h-screen transition-colors duration-300 ${isDark ? 'dark bg-[#121212]' : 'bg-[#F0F0F0]'}`}>
       <PageNavigation isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />
@@ -126,13 +132,13 @@ export default function Terms() {
             }`}>
               If you have any questions about these terms, please contact us
             </p>
-            <button className={`px-8 py-3 rounded-full border ${
+            <Link href="/users/contactus" className={`px-8 py-3 rounded-full border ${
               isDark 
                 ? 'border-[#E0F01F] text-[#E0F01F] hover:bg-[#E0F01F] hover:text-black' 
                 : 'border-[#1F67F0] text-[#1F67F0] hover:bg-[#1F67F0] hover:text-white'
             } transition-all duration-300`}>
               Contact Support
-            </button>
+            </Link>
           </motion.div>
         </div>
         <div className='text-center mt-16'>

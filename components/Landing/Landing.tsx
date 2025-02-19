@@ -20,6 +20,9 @@ export function Landing() {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Close navigation bar when component mounts
+    setIsNavOpen(false);
+
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setShowDropdown(false);
@@ -45,14 +48,13 @@ export function Landing() {
             height={100}
           />
           <div className="flex items-center gap-2 sm:gap-4">
-            <ThemeToggle isDark={isDark} onToggle={toggleTheme} />
+            <ThemeToggle />
             <GoogleSignin />
           </div>
         </header>
         <Navigation 
           isOpen={isNavOpen} 
           onClose={() => setIsNavOpen(false)} 
-          isDark={isDark}
         />
         <main className="flex flex-col items-center mt-[30%] sm:mt-[6%] justify-center text-center max420:mt-[40%] ">
           <p className="text-gray-500 text-body-sm font-normal dark:text-gray-400 p-2 fontcss tracking-widest flex items-center gap-2">

@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { PageNavigation } from '@/components/FormpageNav/PageNavigation';
 import { useStore } from '@/store/store';
 import { motion } from 'framer-motion';
@@ -8,27 +8,68 @@ import { Clock, Mail, MapPin, Phone, Send } from 'lucide-react';
 
 export default function ContactUs() {
   const { isDark, isNavOpen, setIsNavOpen } = useStore();
+  const [formData, setFormData] = React.useState({
+    name: '',
+    email: '',
+    message: ''
+  });
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const contactInfo = [
     {
       title: 'Email Us',
       icon: <Mail className="w-6 h-6 mb-4" />,
-      content: 'support@foliolynkr.com',
-      link: 'mailto:support@foliolynkr.com'
+      content: 'calibertech875@gmail.com',
+      link: 'mailto:calibertech875@gmail.com'
     },
     {
       title: 'Call Us',
       icon: <Phone className="w-6 h-6 mb-4" />,
-      content: '+1 (555) 123-4567',
-      link: 'tel:+15551234567'
+      content: '+91 6382682378',
+      link: 'tel:+916382682378'
     },
     {
       title: 'Location',
       icon: <MapPin className="w-6 h-6 mb-4" />,
-      content: 'San Francisco, CA',
+      content: 'Salem, Tamil Nadu, India',
       link: '#'
     }
   ];
+  useEffect(()=>{
+    setIsNavOpen(false);
+  },[])
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch('/api/send', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        alert('Message sent successfully!');
+        setFormData({ name: '', email: '', message: '' });
+      } else {
+        alert('Failed to send message. Please try again.');
+      }
+    } catch (error) {
+      alert('An error occurred. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }));
+  };
 
   return (
     <div className={`min-h-screen transition-colors duration-300 ${isDark ? 'dark bg-[#121212]' : 'bg-[#F0F0F0]'}`}>
@@ -104,7 +145,7 @@ export default function ContactUs() {
                 : 'bg-white border-gray-200'
             }`}
           >
-            <form className="space-y-6">
+            <form className="space-y-6" onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className={`block mb-2 text-sm font-medium ${
@@ -114,6 +155,10 @@ export default function ContactUs() {
                   </label>
                   <input
                     type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    required
                     className={`w-full p-3 rounded-lg border ${
                       isDark 
                         ? 'bg-[#121212] border-gray-800 text-white' 
@@ -130,6 +175,10 @@ export default function ContactUs() {
                   </label>
                   <input
                     type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
                     className={`w-full p-3 rounded-lg border ${
                       isDark 
                         ? 'bg-[#121212] border-gray-800 text-white' 
@@ -146,6 +195,10 @@ export default function ContactUs() {
                   Message
                 </label>
                 <textarea
+                  name="message"
+                  value={formData.message}
+                  onChange={handleChange}
+                  required
                   rows={6}
                   className={`w-full p-3 rounded-lg border ${
                     isDark 
@@ -157,13 +210,14 @@ export default function ContactUs() {
               </div>
               <button 
                 type="submit"
+                disabled={isSubmitting}
                 className={`px-8 py-3 rounded-full border flex items-center justify-center gap-2 w-full md:w-auto ${
                   isDark 
                     ? 'border-[#E0F01F] text-[#E0F01F] hover:bg-[#E0F01F] hover:text-black' 
                     : 'border-[#1F67F0] text-[#1F67F0] hover:bg-[#1F67F0] hover:text-white'
-                } transition-all duration-300`}
+                } transition-all duration-300 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
-                Send Message
+                {isSubmitting ? 'Sending...' : 'Send Message'}
                 <Send className="w-4 h-4" />
               </button>
             </form>
