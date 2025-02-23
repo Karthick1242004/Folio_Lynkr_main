@@ -54,6 +54,22 @@
         { "number": 3, "title": "ABOUT ME" },
         { "number": 4, "title": "NOTES" }
       ]
+    },
+    {
+      "id": 4,
+      "title": "Image Gallery Portfolio",
+      "description": "A portfolio which shows your images in a grid format with a hover effect and a modal to view the image in full screen with your informations in a detailed manner.",
+      "builtWith": "NEXT JS",
+      "amount": "699",
+      "imageUrl": "/image-gallery.png",
+      "visitUrl": "https://image-gallery-folio-lynkr.netlify.app/",
+      "formUrl": "/users/Form4",
+      "steps": [
+        { "number": 1, "title": "USER DETAILS" },
+        { "number": 2, "title": "WEBSITES" },
+        { "number": 3, "title": "ABOUT ME" },
+        { "number": 4, "title": "NOTES" }
+      ]
     }
   ]
 }

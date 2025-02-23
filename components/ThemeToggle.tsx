@@ -8,12 +8,12 @@ export const ThemeToggle: React.FC = () => {
   return (
     <button
       onClick={toggleTheme}
-      className={`flex items-center gap-2 rounded-full ${isDark ? 'bg-gray-800' : 'bg-gray-200'} p-2 transition-colors`}
+      className={`flex items-center gap-2 rounded-full ${isDark ? 'bg-gray-800' : 'bg-gray-200'} p-2 max500:gap-1 transition-colors`}
     >
-      <div className={`relative w-12 h-6 rounded-full  ${isDark ? 'bg-gray-700' : 'bg-gray-300'}`}>
+      <div className={`relative w-12 h-6 max500:w-6 max500:h-4 rounded-full  ${isDark ? 'bg-gray-700' : 'bg-gray-300'}`}>
         <div
-          className={`absolute top-1 h-4 w-4 rounded-full transition-all duration-300 ${
-            isDark ? 'left-7 bg-gray-900' : 'left-1 bg-yellow-500'
+          className={`absolute top-1 h-4 w-4 max500:h-2 max500:w-2 rounded-full transition-all duration-300 ${
+            isDark ? 'left-7 max500:left-3 bg-gray-900' : 'left-1 bg-yellow-500'
           }`}
         />
       </div>

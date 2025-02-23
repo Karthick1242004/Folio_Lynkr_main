@@ -1,0 +1,507 @@
+"use client"
+import React, { useState, FormEvent, useEffect } from 'react';
+import { useStore } from '@/store/store';
+import axios from 'axios';
+import ProgressBar from '@/components/ProgreseBar/ProgreseBar';
+import { FormInput } from '@/components/ProgreseBar/FormInput';
+import { CldUploadWidget, CloudinaryUploadWidgetResults } from 'next-cloudinary';
+import { useRouter } from 'next/navigation';
+import Payment from '@/components/Payment/Payment';
+import data from '@/Data/data.json';
+import { useSession, signIn } from 'next-auth/react';
+import Footer from '@/components/FormFooter/Footer';
+import { PageNavigation } from '@/components/FormpageNav/PageNavigation';
+
+interface FormDataType {
+  personalInfo: {
+    name: string;
+    designation: string;
+    about: string[];
+    resumeLink: string;
+  };
+  education: Array<{
+    institution: string;
+    degree: string;
+    score: string;
+    duration: string;
+  }>;
+  contact: {
+    email: string;
+    phone: string;
+    location: string;
+    social: {
+      github: string;
+      linkedin: string;
+    };
+  };
+  projects: Array<{
+    id: number;
+    image: string;
+    content: string;
+    demoLink: string;
+    githubLink: string;
+    isHovered: boolean;
+  }>;
+}
+
+interface FormInputProps {
+  type: "email" | "textarea" | "text" | "url" | "tel";
+  name: string;
+  label: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  placeholder?: string;
+}
+
+function Form4() {
+  const { data: session } = useSession();
+  const { subdomain, availability, loading, setSubdomain, setAvailability, setLoading, isPaymentComplete } = useStore();
+  const [currentStep, setCurrentStep] = useState(1);
+  const [isNavOpen, setIsNavOpen] = useState(false);
+  const totalSteps = 6; // Adjust based on the number of steps you want
+  const [formData, setFormData] = useState<FormDataType>({
+    personalInfo: {
+      name: '',
+      designation: '',
+      about: ['', '', ''],
+      resumeLink: '',
+    },
+    education: Array(3).fill(null).map(() => ({
+      institution: '',
+      degree: '',
+      score: '',
+      duration: '',
+    })),
+    contact: {
+      email: '',
+      phone: '',
+      location: '',
+      social: {
+        github: '',
+        linkedin: '',
+      },
+    },
+    projects: Array(10).fill(null).map((_, index) => ({
+      id: index + 1,
+      image: '',
+      content: '',
+      demoLink: '',
+      githubLink: '',
+      isHovered: false,
+    })),
+  });
+  const router = useRouter();
+
+  // Handle input changes
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => {
+      const newFormData = { ...prev };
+      const keys = name.split('.');  // Split the name by dots
+      let current: Record<string, any> = newFormData;
+
+      if (keys.length === 1) {
+        return { ...prev, [name]: value };
+      }
+
+      for (let i = 0; i < keys.length - 1; i++) {
+        current = current[keys[i]];
+      }
+      current[keys[keys.length - 1]] = value;
+      return newFormData;
+    });
+  };
+
+  const handleSubmit = async () => {
+    if (currentStep !== totalSteps) {
+      return;
+    }
+
+    // Get the latest payment status directly from the store
+    const { isPaymentComplete } = useStore.getState();
+
+    if (!isPaymentComplete) {
+      alert("Please complete the payment first");
+      return;
+    }
+
+    if (!subdomain || !availability) {
+      alert("Please enter and check the availability of the subdomain.");
+      return;
+    }
+
+    // Check if user is logged in
+    if (!session) {
+      signIn('github');
+      return;
+    }
+
+    if (!session?.user?.name) {
+      console.error('User name not found in session:', session);
+      alert('Authentication error. Please try logging in again.');
+      return;
+    }
+
+    const userId = session.user.name;
+
+    if (!userId) {
+      console.error('User ID not found in session:', session);
+      alert('Authentication error. Please try logging in again.');
+      return;
+    }
+
+    // If email is missing, use a default format
+    const userEmail = session.user?.email || `${session.user.name}@github.com`;
+
+    const data = {
+      ...formData,
+      subdomain,
+      repo_name: {
+        repo: 'shadcn_bento_folio' // Changed repo name for Form4
+      }
+    };
+
+    try {
+      // Get the GitHub access token from the session
+      const userToken = (session as any)?.accessToken;
+
+      if (!userToken) {
+        console.error('GitHub token not found in session');
+        alert('Authentication error. Please try logging in again.');
+        return;
+      }
+
+      // Step 1: Create a new Gist with the token
+      const createGistResponse = await fetch("https://folio4ubackend-production.up.railway.app/create-gist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          content: JSON.stringify(data, null, 2),
+          userToken: userToken
+        }),
+      });
+
+      if (!createGistResponse.ok) {
+        const errorData = await createGistResponse.json();
+        throw new Error(errorData.message || "Failed to create the Gist");
+      }
+
+      const { gistRawUrl } = await createGistResponse.json();
+
+      // Step 2: Store user and site data with site name
+      const storePayload = {
+        userId: userId,
+        userEmail: userEmail,
+        userName: session.user.name,
+        subdomain: subdomain,
+        gistUrl: gistRawUrl,
+        siteName: 'Image Gallery Portfolio' // Changed site name for Form4
+      };
+
+      console.log('Sending payload to store-hosted-site:', storePayload);
+
+      const storeResponse = await fetch("https://folio4ubackend-production.up.railway.app/store-hosted-site", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(storePayload),
+      });
+
+      if (!storeResponse.ok) {
+        const errorData = await storeResponse.json();
+        throw new Error(errorData.message || "Failed to store site information");
+      }
+
+      // Step 3: Update the Gist URL in the repository
+      const updateGistUrlResponse = await fetch("https://folio4ubackend-production.up.railway.app/update-gist-url", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ 
+          gistRawUrl, 
+          subdomain,
+          repoName: data.repo_name.repo
+        }),
+      });
+
+      if (!updateGistUrlResponse.ok) {
+        throw new Error("Failed to update the Gist URL");
+      }
+
+      router.push('/users/pipeline');
+      
+    } catch (error) {
+      console.error("Error during submission:", error);
+      alert("An error occurred. Please try again.");
+    }
+  };
+
+  const checkAvailability = async () => {
+    if (!subdomain) {
+        alert('Please enter a subdomain');
+        return;
+    }
+
+    setLoading(true);
+    setAvailability(null);
+
+    try {
+        const response = await axios.get(`https://folio4ubackend-production.up.railway.app/check-domain/${subdomain}`);
+        if (response.data.available) {
+            setAvailability(`Subdomain "${subdomain}.netlify.app" is available.`);
+        } else {
+            setAvailability(`Subdomain "${subdomain}.netlify.app" is not available.`);
+        }
+    } catch (error) {
+        console.error('Error during subdomain check:', error);
+        setAvailability('An error occurred while checking availability.');
+    } finally {
+        setLoading(false);
+    }
+  };
+
+  const renderStep = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          <div className="space-y-6">
+            <FormInput
+              label="Site Title"
+              name="personalInfo.name"
+              value={formData.personalInfo.name}
+              onChange={handleInputChange}
+              placeholder="Enter your name"
+              type="text"
+            />
+            <FormInput
+              label="Designation"
+              name="personalInfo.designation"
+              value={formData.personalInfo.designation}
+              onChange={handleInputChange}
+              placeholder="Enter your designation"
+              type="text"
+            />
+            <FormInput
+              label="Resume Link"
+              name="personalInfo.resumeLink"
+              value={formData.personalInfo.resumeLink}
+              onChange={handleInputChange}
+              placeholder="Enter your resume link"
+              type="url"
+            />
+            <FormInput
+              label="Subdomain"
+              name="subdomain"
+              value={subdomain}
+              onChange={(e) => setSubdomain(e.target.value)}
+              placeholder="Enter subdomain"
+              type="text"
+            />
+            <button
+              onClick={checkAvailability}
+              disabled={loading}
+              className="w-full mt-2 px-6 py-3 bg-[#574EFA] text-white rounded-lg hover:bg-[#4A3FF7] disabled:bg-gray-300 transition-colors"
+              type="button"
+            >
+              {loading ? 'Checking...' : 'Check Availability'}
+            </button>
+            {availability && (
+              <p className="mt-2 text-sm text-gray-600">{availability}</p>
+            )}
+          </div>
+        );
+      case 2:
+        return (
+          <div>
+            <h2>Education</h2>
+            {formData.education.map((edu, index) => (
+              <div key={index}>
+                <FormInput
+                  label="Institution"
+                  name={`education.${index}.institution`}
+                  value={edu.institution}
+                  onChange={handleInputChange}
+                  placeholder="Enter institution name"
+                  type="text"
+                />
+                <FormInput
+                  label="Degree"
+                  name={`education.${index}.degree`}
+                  value={edu.degree}
+                  onChange={handleInputChange}
+                  placeholder="Enter degree"
+                  type="text"
+                />
+                <FormInput
+                  label="Score"
+                  name={`education.${index}.score`}
+                  value={edu.score}
+                  onChange={handleInputChange}
+                  placeholder="Enter score"
+                  type="text"
+                />
+                <FormInput
+                  label="Duration"
+                  name={`education.${index}.duration`}
+                  value={edu.duration}
+                  onChange={handleInputChange}
+                  placeholder="Enter duration"
+                  type="text"
+                />
+              </div>
+            ))}
+          </div>
+        );
+      case 3:
+        return (
+          <div>
+            <h2>Contact Information</h2>
+            <FormInput
+              label="Email"
+              name="contact.email"
+              value={formData.contact.email}
+              onChange={handleInputChange}
+              placeholder="Enter your email"
+              type="email"
+            />
+            <FormInput
+              label="Phone"
+              name="contact.phone"
+              value={formData.contact.phone}
+              onChange={handleInputChange}
+              placeholder="Enter your phone number"
+              type="text"
+            />
+            <FormInput
+              label="Location"
+              name="contact.location"
+              value={formData.contact.location}
+              onChange={handleInputChange}
+              placeholder="Enter your location"
+              type="text"
+            />
+            <FormInput
+              label="GitHub URL"
+              name="contact.social.github"
+              value={formData.contact.social.github}
+              onChange={handleInputChange}
+              placeholder="Enter your GitHub URL"
+              type="url"
+            />
+            <FormInput
+              label="LinkedIn URL"
+              name="contact.social.linkedin"
+              value={formData.contact.social.linkedin}
+              onChange={handleInputChange}
+              placeholder="Enter your LinkedIn URL"
+              type="url"
+            />
+          </div>
+        );
+      case 4:
+        return (
+          <div>
+            <h2>Projects</h2>
+            {formData.projects.map((project, index) => (
+              <div key={index}>
+                <FormInput
+                  label="Project Image URL"
+                  name={`projects.${index}.image`}
+                  value={project.image}
+                  onChange={handleInputChange}
+                  placeholder="Enter project image URL"
+                  type="url"
+                />
+                <FormInput
+                  label="Project Content"
+                  name={`projects.${index}.content`}
+                  value={project.content}
+                  onChange={handleInputChange}
+                  placeholder="Enter project description"
+                  type="textarea"
+                />
+                <FormInput
+                  label="Demo Link"
+                  name={`projects.${index}.demoLink`}
+                  value={project.demoLink}
+                  onChange={handleInputChange}
+                  placeholder="Enter demo link"
+                  type="url"
+                />
+                <FormInput
+                  label="GitHub Link"
+                  name={`projects.${index}.githubLink`}
+                  value={project.githubLink}
+                  onChange={handleInputChange}
+                  placeholder="Enter GitHub link"
+                  type="url"
+                />
+              </div>
+            ))}
+          </div>
+        );
+      // Add more steps as needed
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-[#F0F0F0] p-4 md:p-8">
+      <PageNavigation
+        isOpen={isNavOpen}
+        onClose={() => setIsNavOpen(true)}
+      />
+      <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-lg p-4 md:p-8">
+        <div className="flex flex-col md:flex-row gap-8">
+          <ProgressBar
+            currentStep={currentStep}
+            totalSteps={totalSteps}
+            onStepClick={(step) => setCurrentStep(step)}
+            steps={data.sites[3].steps} // Adjust based on your data
+          />
+          <div className="flex-1 max-w-2xl !min-h-[10%]">
+            <h1 className="text-3xl font-bold text-[#1A1E3C]">
+              {currentStep === 1 && "Personal Information"}
+              {currentStep === 2 && "Education"}
+              {currentStep === 3 && "Contact Information"}
+              {currentStep === 4 && "Projects"}
+              {/* Add more titles for additional steps */}
+            </h1>
+            <form onSubmit={handleSubmit} className="space-y-8">
+              {renderStep()}
+              <div className="flex justify-between pt-8">
+                {currentStep > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => setCurrentStep((prev) => Math.max(prev - 1, 1))}
+                    className="px-6 py-3 text-[#574EFA] hover:text-[#4A3FF7] font-medium"
+                  >
+                    Go Back
+                  </button>
+                )}
+                {currentStep < totalSteps ? (
+                  <button
+                    type="button"
+                    onClick={() => setCurrentStep((prev) => Math.min(prev + 1, totalSteps))}
+                    className="ml-auto px-6 py-3 bg-[#1A1E3C] text-white rounded-lg hover:bg-[#2A2E4C] transition-colors"
+                  >
+                    Next Step
+                  </button>
+                ) : (
+                  <Payment
+                    onSuccess={handleSubmit}
+                    amount={699} // Adjust based on your pricing
+                  />
+                )}
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <Footer />
+    </div>
+  );
+}
+
+export default Form4;

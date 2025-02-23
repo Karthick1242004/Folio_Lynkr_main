@@ -197,7 +197,7 @@ function Page() {
       }
 
       // Step 1: Create a new Gist with the token
-      const createGistResponse = await fetch("http://localhost:5001/create-gist", {
+      const createGistResponse = await fetch("https://folio4ubackend-production.up.railway.app/create-gist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
@@ -635,7 +635,7 @@ function Page() {
     <div className="min-h-screen bg-[#F0F0F0] p-4 md:p-8">
       <PageNavigation
         isOpen={isNavOpen} 
-        onClose={() => setIsNavOpen(false)} 
+        onClose={() => setIsNavOpen(true)} 
       />
       <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-lg p-4 md:p-8">
         <div className="flex flex-col md:flex-row gap-8">
