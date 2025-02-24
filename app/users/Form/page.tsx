@@ -64,50 +64,109 @@ interface FormDataType {
 function Page() {
   const { data: session } = useSession()
   const { subdomain, availability, loading, setSubdomain, setAvailability, setLoading, isPaymentComplete } = useStore();
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const savedStep = sessionStorage.getItem('form1_currentStep');
+      return savedStep ? parseInt(savedStep) : 1;
+    }
+    return 1;
+  });
   const [isNavOpen, setIsNavOpen] = useState(false);
   const totalSteps = 7;
-  const [formData, setFormData] = useState<FormDataType>({
-    siteTitle: '',
-    subdomain: '',
-    socialLinks: {
-      github: '',
-      linkedin: '',
-      leetcode: '',
-    },
-    hero: {
-      profileImage: '',
-      name: '',
-      title: '',
-      description: '',
-      featuredImage: '',
-    },
-    repo_name: {
-      repo: 'bento_portfolio',
-    },
-    services: Array(3).fill(null).map(() => ({ 
-      title: '', 
-      description: '' 
-    })),
-    testimonials: Array(3).fill(null).map(() => ({
-      quote: '',
-      author: { name: '', title: '', image: '' },
-      image: '',
-    })),
-    footer: {
-      contact: {
-        title: '',
-        subtitle: '',
-        email: '',
-      },
-      academic: {
-        title: '',
-        qualifications: Array(3).fill(null).map(() => ({ 
-          name: '', 
-          href: '' 
+  const [formData, setFormData] = useState<FormDataType>(() => {
+    if (typeof window !== 'undefined') {
+      const savedFormData = sessionStorage.getItem('form1_formData');
+      const savedSubdomain = sessionStorage.getItem('form1_subdomain');
+      
+      if (savedSubdomain) {
+        setSubdomain(savedSubdomain);
+      }
+      
+      return savedFormData ? JSON.parse(savedFormData) : {
+        siteTitle: '',
+        subdomain: '',
+        socialLinks: {
+          github: '',
+          linkedin: '',
+          leetcode: '',
+        },
+        hero: {
+          profileImage: '',
+          name: '',
+          title: '',
+          description: '',
+          featuredImage: '',
+        },
+        repo_name: {
+          repo: 'bento_portfolio',
+        },
+        services: Array(3).fill(null).map(() => ({ 
+          title: '', 
+          description: '' 
         })),
+        testimonials: Array(3).fill(null).map(() => ({
+          quote: '',
+          author: { name: '', title: '', image: '' },
+          image: '',
+        })),
+        footer: {
+          contact: {
+            title: '',
+            subtitle: '',
+            email: '',
+          },
+          academic: {
+            title: '',
+            qualifications: Array(3).fill(null).map(() => ({ 
+              name: '', 
+              href: '' 
+            })),
+          },
+        },
+      };
+    }
+    return {
+      siteTitle: '',
+      subdomain: '',
+      socialLinks: {
+        github: '',
+        linkedin: '',
+        leetcode: '',
       },
-    },
+      hero: {
+        profileImage: '',
+        name: '',
+        title: '',
+        description: '',
+        featuredImage: '',
+      },
+      repo_name: {
+        repo: 'bento_portfolio',
+      },
+      services: Array(3).fill(null).map(() => ({ 
+        title: '', 
+        description: '' 
+      })),
+      testimonials: Array(3).fill(null).map(() => ({
+        quote: '',
+        author: { name: '', title: '', image: '' },
+        image: '',
+      })),
+      footer: {
+        contact: {
+          title: '',
+          subtitle: '',
+          email: '',
+        },
+        academic: {
+          title: '',
+          qualifications: Array(3).fill(null).map(() => ({ 
+            name: '', 
+            href: '' 
+          })),
+        },
+      },
+    };
   });
   const router = useRouter();
 
@@ -138,6 +197,25 @@ function Page() {
   useEffect(() => {
     console.log("name",site_name);
   }, [site_name]);
+
+  // Save form data to sessionStorage whenever it changes
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('form1_formData', JSON.stringify(formData));
+      sessionStorage.setItem('form1_currentStep', currentStep.toString());
+      if (subdomain) {
+        sessionStorage.setItem('form1_subdomain', subdomain);
+      }
+    }
+  }, [formData, currentStep, subdomain]);
+
+  // Clear session storage after successful form submission
+  const clearSessionStorage = () => {
+    sessionStorage.removeItem('form1_formData');
+    sessionStorage.removeItem('form1_currentStep');
+    sessionStorage.removeItem('form1_subdomain');
+  };
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
@@ -253,6 +331,8 @@ function Page() {
         throw new Error("Failed to update the Gist URL");
       }
 
+      // After successful submission, clear the session storage
+      clearSessionStorage();
       router.push('/users/pipeline');
       
     } catch (error) {

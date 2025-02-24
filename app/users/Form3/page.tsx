@@ -1,5 +1,5 @@
 "use client"
-import React, { useState, FormEvent } from 'react';
+import React, { useState, FormEvent, useEffect } from 'react';
 import { useStore } from '@/store/store';
 import axios from 'axios';
 import ProgressBar from '@/components/ProgreseBar/ProgreseBar';
@@ -68,75 +68,116 @@ interface UserProfileData {
 
 function Page() {
   const { subdomain, availability, loading, setSubdomain, setAvailability, setLoading, isPaymentComplete } = useStore();
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(() => {
+    // Initialize currentStep from sessionStorage or default to 1
+    if (typeof window !== 'undefined') {
+      const savedStep = sessionStorage.getItem('form3_currentStep');
+      return savedStep ? parseInt(savedStep) : 1;
+    }
+    return 1;
+  });
   const [isNavOpen, setIsNavOpen] = useState(false);
   const totalSteps = 4;
-  const [formData, setFormData] = useState<UserProfileData>({
-    name: '',
-    avatar: '',
-    websites: {
-      favorites: {
-        title: 'Favorites',
-        sites: Array(4).fill(null).map(() => ({
-          id: '',
-          title: '',
-          img: '',
-          link: ''
-        }))
-      },
-      freq: {
-        title: 'Frequently Visited',
-        sites: Array(8).fill(null).map(() => ({
-          id: '',
-          title: '',
-          img: '',
-          link: ''
-        }))
+
+  // Initialize formData from sessionStorage or default values
+  const [formData, setFormData] = useState<UserProfileData>(() => {
+    if (typeof window !== 'undefined') {
+      const savedFormData = sessionStorage.getItem('form3_formData');
+      const savedSubdomain = sessionStorage.getItem('form3_subdomain');
+      
+      if (savedSubdomain) {
+        setSubdomain(savedSubdomain);
       }
-    },
-    about: {
-      name: '',
-      bio: ['', '', ''],
-      education: '',
-      interests: '',
-      hobbies: '',
-      contact: {
-        email: '',
-        github: '',
-        linkedin: ''
-      }
-    },
-    notes: [
-      {
-        id: 'profile',
-        title: 'Profile',
-        icon: 'BsFolder2',
-        md: Array(2).fill(null).map(() => ({
-          id: '',
-          title: '',
-          file: '',
-          icon: '',
-          excerpt: ''
-        }))
-      },
-      {
-        id: 'project',
-        title: 'Projects',
-        icon: 'BsFolder2',
-        md: Array(2).fill(null).map(() => ({
-          id: '',
-          title: '',
-          file: '',
-          icon: '',
-          excerpt: '',
-          link: ''
-        }))
-      }
-    ],
-    repo_name: {
-      repo: 'macOS_portfolio_new'
+      
+      return savedFormData ? JSON.parse(savedFormData) : {
+        name: '',
+        avatar: '',
+        websites: {
+          favorites: {
+            title: 'Favorites',
+            sites: Array(4).fill(null).map(() => ({
+              id: '',
+              title: '',
+              img: '',
+              link: ''
+            }))
+          },
+          freq: {
+            title: 'Frequently Visited',
+            sites: Array(8).fill(null).map(() => ({
+              id: '',
+              title: '',
+              img: '',
+              link: ''
+            }))
+          }
+        },
+        about: {
+          name: '',
+          bio: ['', '', ''],
+          education: '',
+          interests: '',
+          hobbies: '',
+          contact: {
+            email: '',
+            github: '',
+            linkedin: ''
+          }
+        },
+        notes: [
+          {
+            id: 'profile',
+            title: 'Profile',
+            icon: 'BsFolder2',
+            md: Array(2).fill(null).map(() => ({
+              id: '',
+              title: '',
+              file: '',
+              icon: '',
+              excerpt: ''
+            }))
+          },
+          {
+            id: 'project',
+            title: 'Projects',
+            icon: 'BsFolder2',
+            md: Array(2).fill(null).map(() => ({
+              id: '',
+              title: '',
+              file: '',
+              icon: '',
+              excerpt: '',
+              link: ''
+            }))
+          }
+        ],
+        repo_name: {
+          repo: 'macOS_portfolio_new'
+        }
+      };
     }
+    return {
+      // Your default formData structure (same as above)
+    };
   });
+
+  // Save form data to sessionStorage whenever it changes
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('form3_formData', JSON.stringify(formData));
+      sessionStorage.setItem('form3_currentStep', currentStep.toString());
+      if (subdomain) {
+        sessionStorage.setItem('form3_subdomain', subdomain);
+      }
+    }
+  }, [formData, currentStep, subdomain]);
+
+  // Clear session storage after successful form submission
+  const clearSessionStorage = () => {
+    sessionStorage.removeItem('form3_formData');
+    sessionStorage.removeItem('form3_currentStep');
+    sessionStorage.removeItem('form3_subdomain');
+  };
 
   const router = useRouter();
   const siteSteps = data.sites[2].steps;
@@ -257,6 +298,8 @@ function Page() {
         throw new Error("Failed to update the Gist URL");
       }
 
+      // After successful submission, clear the session storage
+      clearSessionStorage();
       router.push('/users/pipeline');
       
     } catch (error) {

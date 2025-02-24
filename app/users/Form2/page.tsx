@@ -1,6 +1,6 @@
 // Form2
 "use client"
-import React, { useState, FormEvent } from 'react';
+import React, { useState, FormEvent, useEffect } from 'react';
 import { useStore } from '@/store/store';
 import axios from 'axios';
 import ProgressBar from '@/components/ProgreseBar/ProgreseBar';
@@ -60,7 +60,14 @@ interface FormDataType {
 
 function Page() {
   const { subdomain, availability, loading, setSubdomain, setAvailability, setLoading, isPaymentComplete } = useStore();
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(() => {
+    // Initialize currentStep from sessionStorage or default to 1
+    if (typeof window !== 'undefined') {
+      const savedStep = sessionStorage.getItem('form2_currentStep');
+      return savedStep ? parseInt(savedStep) : 1;
+    }
+    return 1;
+  });
   const [isNavOpen, setIsNavOpen] = useState(false);
   const totalSteps = 8;
   
@@ -69,50 +76,124 @@ function Page() {
   
   const site_name = '3D Interactive Portfolio';
   
-  const [formData, setFormData] = useState<FormDataType>({
-    projects: Array(3).fill(null).map(() => ({
-      projectName: '',
-      projectType: '',
-      projectContent: '',
-      projectImage: '',
-      projectUrl: '',
-      githubUrl: '',
-    })),
-    top_project: {
-      title: '',
-      description: '',
-      websiteUrl: '',
-      websiteDisplay: '',
-    },
-    repo_name: {
-      repo: 'Ace_portfolio_lynkr',
-    },
-    contacts: Array(3).fill(null).map((_, index) => ({
-      id: index + 1,
-      name: '',
-      designation: '',
-      url: '',
-    })),
-    services: Array(3).fill(null).map(() => ({
-      title: '',
-      description: '',
-    })),
-    skillset: {
-      image: '',
-    },
-    hero: {
-      name: '',
-      tagline: '',
-      resumeUrl: '',
-      resumeText: '',
-    },
-    testimonials: Array(3).fill(null).map((_, index) => ({
-      id: index,
-      name: '',
-      designation: '',
-      content: '',
-    })),
+  const [formData, setFormData] = useState<FormDataType>(() => {
+    // Initialize formData from sessionStorage or default values
+    if (typeof window !== 'undefined') {
+      const savedFormData = sessionStorage.getItem('form2_formData');
+      const savedSubdomain = sessionStorage.getItem('form2_subdomain');
+      
+      if (savedSubdomain) {
+        setSubdomain(savedSubdomain);
+      }
+      
+      return savedFormData ? JSON.parse(savedFormData) : {
+        projects: Array(3).fill(null).map(() => ({
+          projectName: '',
+          projectType: '',
+          projectContent: '',
+          projectImage: '',
+          projectUrl: '',
+          githubUrl: '',
+        })),
+        top_project: {
+          title: '',
+          description: '',
+          websiteUrl: '',
+          websiteDisplay: '',
+        },
+        repo_name: {
+          repo: 'bento_portfolio',
+        },
+        contacts: Array(3).fill(null).map((_, index) => ({
+          id: index + 1,
+          name: '',
+          designation: '',
+          url: '',
+        })),
+        services: Array(3).fill(null).map(() => ({
+          title: '',
+          description: '',
+        })),
+        skillset: {
+          image: '',
+        },
+        hero: {
+          name: '',
+          tagline: '',
+          resumeUrl: '',
+          resumeText: '',
+        },
+        testimonials: Array(3).fill(null).map((_, index) => ({
+          id: index + 1,
+          name: '',
+          designation: '',
+          content: '',
+        })),
+      };
+    }
+    return {
+      projects: Array(3).fill(null).map(() => ({
+        projectName: '',
+        projectType: '',
+        projectContent: '',
+        projectImage: '',
+        projectUrl: '',
+        githubUrl: '',
+      })),
+      top_project: {
+        title: '',
+        description: '',
+        websiteUrl: '',
+        websiteDisplay: '',
+      },
+      repo_name: {
+        repo: 'bento_portfolio',
+      },
+      contacts: Array(3).fill(null).map((_, index) => ({
+        id: index + 1,
+        name: '',
+        designation: '',
+        url: '',
+      })),
+      services: Array(3).fill(null).map(() => ({
+        title: '',
+        description: '',
+      })),
+      skillset: {
+        image: '',
+      },
+      hero: {
+        name: '',
+        tagline: '',
+        resumeUrl: '',
+        resumeText: '',
+      },
+      testimonials: Array(3).fill(null).map((_, index) => ({
+        id: index + 1,
+        name: '',
+        designation: '',
+        content: '',
+      })),
+    };
   });
+
+  // Save form data to sessionStorage whenever it changes
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('form2_formData', JSON.stringify(formData));
+      sessionStorage.setItem('form2_currentStep', currentStep.toString());
+      if (subdomain) {
+        sessionStorage.setItem('form2_subdomain', subdomain);
+      }
+    }
+  }, [formData, currentStep, subdomain]);
+
+  // Clear session storage after successful form submission
+  const clearSessionStorage = () => {
+    sessionStorage.removeItem('form2_formData');
+    sessionStorage.removeItem('form2_currentStep');
+    sessionStorage.removeItem('form2_subdomain');
+  };
 
   const router = useRouter();
   const { data: session } = useSession();
@@ -137,7 +218,7 @@ function Page() {
     });
   };
 
-  // Reuse the same submission logic
+  // Modify handleSubmit to clear storage after successful submission
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
@@ -236,6 +317,8 @@ function Page() {
         throw new Error("Failed to update the Gist URL");
       }
 
+      // After successful submission, clear the session storage
+      clearSessionStorage();
       router.push('/users/pipeline');
       
     } catch (error) {

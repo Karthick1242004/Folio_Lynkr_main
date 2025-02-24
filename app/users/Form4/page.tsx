@@ -56,40 +56,110 @@ interface FormInputProps {
 function Form4() {
   const { data: session } = useSession();
   const { subdomain, availability, loading, setSubdomain, setAvailability, setLoading, isPaymentComplete } = useStore();
-  const [currentStep, setCurrentStep] = useState(1);
-  const [isNavOpen, setIsNavOpen] = useState(false);
-  const totalSteps = 6; // Adjust based on the number of steps you want
-  const [formData, setFormData] = useState<FormDataType>({
-    personalInfo: {
-      name: '',
-      designation: '',
-      about: ['', '', ''],
-      resumeLink: '',
-    },
-    education: Array(3).fill(null).map(() => ({
-      institution: '',
-      degree: '',
-      score: '',
-      duration: '',
-    })),
-    contact: {
-      email: '',
-      phone: '',
-      location: '',
-      social: {
-        github: '',
-        linkedin: '',
-      },
-    },
-    projects: Array(10).fill(null).map((_, index) => ({
-      id: index + 1,
-      image: '',
-      content: '',
-      demoLink: '',
-      githubLink: '',
-      isHovered: false,
-    })),
+  const [currentStep, setCurrentStep] = useState(() => {
+    // Initialize currentStep from sessionStorage or default to 1
+    if (typeof window !== 'undefined') {
+      const savedStep = sessionStorage.getItem('form4_currentStep');
+      return savedStep ? parseInt(savedStep) : 1;
+    }
+    return 1;
   });
+  const [isNavOpen, setIsNavOpen] = useState(false);
+  const totalSteps = 4;
+  
+  // Initialize formData from sessionStorage or default values
+  const [formData, setFormData] = useState<FormDataType>(() => {
+    if (typeof window !== 'undefined') {
+      const savedFormData = sessionStorage.getItem('form4_formData');
+      const savedSubdomain = sessionStorage.getItem('form4_subdomain');
+      
+      if (savedSubdomain) {
+        setSubdomain(savedSubdomain);
+      }
+      
+      return savedFormData ? JSON.parse(savedFormData) : {
+        personalInfo: {
+          name: '',
+          designation: '',
+          about: ['', '', ''],
+          resumeLink: '',
+        },
+        education: Array(3).fill(null).map(() => ({
+          institution: '',
+          degree: '',
+          score: '',
+          duration: '',
+        })),
+        contact: {
+          email: '',
+          phone: '',
+          location: '',
+          social: {
+            github: '',
+            linkedin: '',
+          },
+        },
+        projects: Array(10).fill(null).map((_, index) => ({
+          id: index + 1,
+          image: '',
+          content: '',
+          demoLink: '',
+          githubLink: '',
+          isHovered: false,
+        })),
+      };
+    }
+    return {
+      personalInfo: {
+        name: '',
+        designation: '',
+        about: ['', '', ''],
+        resumeLink: '',
+      },
+      education: Array(3).fill(null).map(() => ({
+        institution: '',
+        degree: '',
+        score: '',
+        duration: '',
+      })),
+      contact: {
+        email: '',
+        phone: '',
+        location: '',
+        social: {
+          github: '',
+          linkedin: '',
+        },
+      },
+      projects: Array(10).fill(null).map((_, index) => ({
+        id: index + 1,
+        image: '',
+        content: '',
+        demoLink: '',
+        githubLink: '',
+        isHovered: false,
+      })),
+    };
+  });
+
+  // Save form data to sessionStorage whenever it changes
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('form4_formData', JSON.stringify(formData));
+      sessionStorage.setItem('form4_currentStep', currentStep.toString());
+      if (subdomain) {
+        sessionStorage.setItem('form4_subdomain', subdomain);
+      }
+    }
+  }, [formData, currentStep, subdomain]);
+
+  // Clear session storage after successful form submission
+  const clearSessionStorage = () => {
+    sessionStorage.removeItem('form4_formData');
+    sessionStorage.removeItem('form4_currentStep');
+    sessionStorage.removeItem('form4_subdomain');
+  };
+
   const router = useRouter();
 
   // Handle input changes
@@ -228,8 +298,9 @@ function Form4() {
         throw new Error("Failed to update the Gist URL");
       }
 
+      // After successful submission, clear the session storage
+      clearSessionStorage();
       router.push('/users/pipeline');
-      
     } catch (error) {
       console.error("Error during submission:", error);
       alert("An error occurred. Please try again.");
@@ -404,13 +475,9 @@ function Form4() {
             <h2>Projects</h2>
             {formData.projects.map((project, index) => (
               <div key={index}>
-                <FormInput
-                  label="Project Image URL"
-                  name={`projects.${index}.image`}
-                  value={project.image}
-                  onChange={handleInputChange}
-                  placeholder="Enter project image URL"
-                  type="url"
+                <ImageUploadField
+                  fieldName={`projects.${index}.image`}
+                  label={`Project ${index + 1} Image`}
                 />
                 <FormInput
                   label="Project Content"
@@ -444,6 +511,76 @@ function Form4() {
       default:
         return null;
     }
+  };
+
+  // Add ImageUploadField component after handleInputChange
+  const ImageUploadField = ({ fieldName, label }: { fieldName: string; label: string }) => {
+    return (
+      <div className="space-y-2">
+        <label className="block text-sm font-medium text-gray-700">{label}</label>
+        <div className="flex flex-col gap-2">
+          <CldUploadWidget 
+            options={{ 
+              cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+              uploadPreset: 'my_uploads'
+            }}
+            onSuccess={(result: any) => {
+              if (result.info && typeof result.info === 'object' && 'secure_url' in result.info) {
+                handleImageUpload(fieldName)(result);
+              }
+            }}
+          >
+            {({ open }) => (
+              <button onClick={() => open()} type="button" className="w-full px-4 py-2 border border-gray-300 rounded-md">
+                Upload Image
+              </button>
+            )}
+          </CldUploadWidget>
+
+          {getValue(formData, fieldName) && (
+            <div className="relative w-12 h-12">
+              <img
+                src={getValue(formData, fieldName)}
+                alt={`${label} preview`}
+                className="w-full h-full object-cover rounded-md"
+              />
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  // Add helper functions
+  const handleImageUpload = (fieldName: string) => (result: CloudinaryUploadWidgetResults) => {
+    if (result.info && typeof result.info === 'object' && 'secure_url' in result.info) {
+      const imageUrl = result.info.secure_url;
+      setFormData(prev => {
+        const newFormData = { ...prev };
+        const keys = fieldName.split('.');
+        let current: Record<string, any> = newFormData;
+        
+        for (let i = 0; i < keys.length - 1; i++) {
+          if (keys[i].match(/^\d+$/)) {
+            current = current[parseInt(keys[i])];
+          } else {
+            current = current[keys[i]];
+          }
+        }
+        
+        current[keys[keys.length - 1]] = imageUrl;
+        return newFormData;
+      });
+    }
+  };
+
+  const getValue = (obj: FormDataType, path: string): string => {
+    return path.split('.').reduce((acc: any, part) => {
+      if (acc && typeof acc === 'object') {
+        return acc[part];
+      }
+      return '';
+    }, formData);
   };
 
   return (
