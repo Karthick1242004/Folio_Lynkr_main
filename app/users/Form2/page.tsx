@@ -102,7 +102,7 @@ function Page() {
           websiteDisplay: '',
         },
         repo_name: {
-          repo: 'bento_portfolio',
+          repo: 'Ace_portfolio_lynkr',
         },
         contacts: Array(3).fill(null).map((_, index) => ({
           id: index + 1,
