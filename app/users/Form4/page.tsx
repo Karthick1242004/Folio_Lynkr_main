@@ -99,7 +99,7 @@ function Form4() {
             linkedin: '',
           },
         },
-        projects: Array(10).fill(null).map((_, index) => ({
+        projects: Array(1).fill(null).map((_, index) => ({
           id: index + 1,
           image: '',
           content: '',
@@ -131,7 +131,7 @@ function Form4() {
           linkedin: '',
         },
       },
-      projects: Array(10).fill(null).map((_, index) => ({
+      projects: Array(1).fill(null).map((_, index) => ({
         id: index + 1,
         image: '',
         content: '',
@@ -472,39 +472,61 @@ function Form4() {
       case 4:
         return (
           <div>
-            <h2>Projects</h2>
-            {formData.projects.map((project, index) => (
-              <div key={index}>
-                <ImageUploadField
-                  fieldName={`projects.${index}.image`}
-                  label={`Project ${index + 1} Image`}
-                />
-                <FormInput
-                  label="Project Content"
-                  name={`projects.${index}.content`}
-                  value={project.content}
-                  onChange={handleInputChange}
-                  placeholder="Enter project description"
-                  type="textarea"
-                />
-                <FormInput
-                  label="Demo Link"
-                  name={`projects.${index}.demoLink`}
-                  value={project.demoLink}
-                  onChange={handleInputChange}
-                  placeholder="Enter demo link"
-                  type="url"
-                />
-                <FormInput
-                  label="GitHub Link"
-                  name={`projects.${index}.githubLink`}
-                  value={project.githubLink}
-                  onChange={handleInputChange}
-                  placeholder="Enter GitHub link"
-                  type="url"
-                />
-              </div>
-            ))}
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">Projects</h2>
+              <button
+                type="button"
+                onClick={addProject}
+                className="px-4 py-2 bg-[#574EFA] text-white rounded-lg hover:bg-[#4A3FF7]"
+              >
+                Add Project
+              </button>
+            </div>
+            <div className="space-y-6 !h-[370px] overflow-y-scroll">
+              {formData.projects.map((project, index) => (
+                <div key={index} className="space-y-2 p-4 border rounded relative">
+                  {formData.projects.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeProject(index)}
+                      className="absolute top-2 right-2 text-red-500 hover:text-red-700"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                      </svg>
+                    </button>
+                  )}
+                  <ImageUploadField
+                    fieldName={`projects.${index}.image`}
+                    label={`Project ${index + 1} Image`}
+                  />
+                  <FormInput
+                    label="Project Content"
+                    name={`projects.${index}.content`}
+                    value={project.content}
+                    onChange={handleInputChange}
+                    placeholder="Enter project description"
+                    type="textarea"
+                  />
+                  <FormInput
+                    label="Demo Link"
+                    name={`projects.${index}.demoLink`}
+                    value={project.demoLink}
+                    onChange={handleInputChange}
+                    placeholder="Enter demo link"
+                    type="url"
+                  />
+                  <FormInput
+                    label="GitHub Link"
+                    name={`projects.${index}.githubLink`}
+                    value={project.githubLink}
+                    onChange={handleInputChange}
+                    placeholder="Enter GitHub link"
+                    type="url"
+                  />
+                </div>
+              ))}
+            </div>
           </div>
         );
       // Add more steps as needed
@@ -581,6 +603,30 @@ function Form4() {
       }
       return '';
     }, formData);
+  };
+
+  const addProject = () => {
+    setFormData(prev => ({
+      ...prev,
+      projects: [
+        ...prev.projects,
+        {
+          id: prev.projects.length + 1,
+          image: '',
+          content: '',
+          demoLink: '',
+          githubLink: '',
+          isHovered: false,
+        }
+      ]
+    }));
+  };
+
+  const removeProject = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      projects: prev.projects.filter((_, i) => i !== index)
+    }));
   };
 
   return (

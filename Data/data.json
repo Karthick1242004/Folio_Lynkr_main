@@ -66,10 +66,30 @@
       "formUrl": "/users/Form4",
       "steps": [
         { "number": 1, "title": "USER DETAILS" },
-        { "number": 2, "title": "WEBSITES" },
-        { "number": 3, "title": "ABOUT ME" },
-        { "number": 4, "title": "NOTES" }
+        { "number": 2, "title": "EDUCATION" },
+        { "number": 3, "title": "CONTACT INFO" },
+        { "number": 4, "title": "PROJECTS" }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Framer Portfolio",
+      "description": "A portfolio designed in Framer and developed using React JS and Tailwind CSS which shows a unqiue POV of your profile with detailed analysis and grater depth.",
+      "builtWith": "REACT JS",
+      "amount": "799",
+      "imageUrl": "/framer-portfolio.png",
+      "visitUrl": "https://dark-portfolio-folio-lynkr.netlify.app/",
+      "formUrl": "/users/Form5",
+      "steps": [
+        { "number": 1, "title": "SITE DETAILS" },
+        { "number": 2, "title": "PEROSNAL INFO" },
+        { "number": 3, "title": "PROJECTS" },
+        { "number": 4, "title": "CAREER HISTORY" },
+        { "number": 5, "title": "FAQs" },
+        { "number": 6, "title": "SOCIAL LINKS" },
+        { "number": 7, "title": "FOOTER" }
       ]
     }
   ]
 }
+

@@ -87,7 +87,7 @@ function Page() {
       }
       
       return savedFormData ? JSON.parse(savedFormData) : {
-        projects: Array(3).fill(null).map(() => ({
+        projects: Array(1).fill(null).map(() => ({
           projectName: '',
           projectType: '',
           projectContent: '',
@@ -132,7 +132,7 @@ function Page() {
       };
     }
     return {
-      projects: Array(3).fill(null).map(() => ({
+      projects: Array(1).fill(null).map(() => ({
         projectName: '',
         projectType: '',
         projectContent: '',
@@ -426,6 +426,30 @@ function Page() {
     );
   };
 
+  const addProject = () => {
+    setFormData(prev => ({
+      ...prev,
+      projects: [
+        ...prev.projects,
+        {
+          projectName: '',
+          projectType: '',
+          projectContent: '',
+          projectImage: '',
+          projectUrl: '',
+          githubUrl: '',
+        }
+      ]
+    }));
+  };
+
+  const removeProject = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      projects: prev.projects.filter((_, i) => i !== index)
+    }));
+  };
+
   const renderStep = () => {
     switch (currentStep) {
       case 1:
@@ -505,9 +529,29 @@ function Page() {
       case 3:
         return (
           <div className="space-y-4 !h-[370px] overflow-y-scroll">
-            <h2 className="text-xl font-semibold">Projects</h2>
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-semibold">Projects</h2>
+              <button
+                type="button"
+                onClick={addProject}
+                className="px-4 py-2 bg-[#574EFA] text-white rounded-lg hover:bg-[#4A3FF7]"
+              >
+                Add Project
+              </button>
+            </div>
             {formData.projects.map((_, index) => (
-              <div key={index} className="space-y-2 p-4 border rounded">
+              <div key={index} className="space-y-2 p-4 border rounded relative">
+                {formData.projects.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removeProject(index)}
+                    className="absolute top-2 right-2 text-red-500 hover:text-red-700"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                  </button>
+                )}
                 <FormInput 
                   type="text" 
                   name={`projects.${index}.projectName`}
