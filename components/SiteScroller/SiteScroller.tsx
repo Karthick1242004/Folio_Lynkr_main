@@ -15,28 +15,38 @@ export default function SiteScroller() {
   }
   
   return (
-    <div className="flex flex-row gap-2 w-full px-4 py-4 max700:flex-col max700:gap-4 max700:items-center">
-      {data.sites.map((site) => (
-        <div key={site.id} className="flex flex-col gap-3 w-1/3 max700:w-full">
+    <div className="p-2 max-w-[1600px] mx-auto">
+      <div className="grid grid-cols-3 gap-1 max700:grid-cols-1">
+        {data.sites.map((site) => (
           <div 
-            onClick={() => handleSiteClick(site.id)}
-            className={`group cursor-pointer ${isDark ? 'border rounded-lg border-gray-600' : 'border rounded-lg border-gray-200'}`}
+            key={site.id} 
+            className="relative overflow-hidden rounded-xl transition-transform duration-300 "
           >
-            <div className="relative w-full overflow-hidden rounded-[8px]">
-              <div className="relative">
+            <div 
+              onClick={() => handleSiteClick(site.id)}
+              className={`group cursor-pointer h-[240px] ${
+                isDark ? 'bg-gray-800/50' : 'bg-gray-50/50'
+              } rounded-xl border border-gray-200 dark:border-gray-800`}
+            >
+              <div className="relative w-full h-full overflow-hidden rounded-xl">
                 <Image 
                   src={site.imageUrl}
                   alt={site.title} 
                   width={1000} 
                   height={1000} 
-                  className="rounded-[8px] transition-all duration-300 group-hover:scale-105" 
+                  className="object-cover w-full h-full transition-all duration-300 group-hover:scale-105"
                 />
                 
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/5 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300">
                   <div className="absolute bottom-0 left-0 right-0 p-6 flex justify-between items-center">
-                    <span className={`text-xl font-medium ${isDark ? 'text-gray-100' : 'text-white'}`}>
-                      {site.title}
-                    </span>
+                    <div className="flex flex-col gap-2">
+                      <span className={`text-xl font-medium ${isDark ? 'text-gray-100' : 'text-white'}`}>
+                        {site.title}
+                      </span>
+                      <span className="text-sm text-gray-300">
+                        {site.builtWith}
+                      </span>
+                    </div>
                     <button 
                       onClick={(e) => {
                         e.stopPropagation();
@@ -57,8 +67,8 @@ export default function SiteScroller() {
               </div>
             </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   )
 }

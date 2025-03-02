@@ -19,7 +19,7 @@ export default function RefundPortal() {
         'Attach any relevant screenshots or proof of payment',
         'Submit your request and wait for our team to review',
         'You will receive a confirmation email within 24 hours',
-        'Refund will be processed within 5-7 business days if approved'
+        'Refund will be processed within 2-3 business days if approved'
       ]
     },
     {

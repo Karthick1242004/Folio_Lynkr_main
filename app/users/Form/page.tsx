@@ -713,10 +713,12 @@ function Page() {
 
   return (
     <div className="min-h-screen bg-[#F0F0F0] p-4 md:p-8">
+      <div className='z-30'>
       <PageNavigation
         isOpen={isNavOpen} 
         onClose={() => setIsNavOpen(true)} 
       />
+      </div>
       <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-lg p-4 md:p-8">
         <div className="flex flex-col md:flex-row gap-8">
           <ProgressBar 
