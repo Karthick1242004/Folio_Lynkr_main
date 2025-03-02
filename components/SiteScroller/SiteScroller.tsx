@@ -26,7 +26,7 @@ export default function SiteScroller() {
               onClick={() => handleSiteClick(site.id)}
               className={`group cursor-pointer h-[240px] ${
                 isDark ? 'bg-gray-800/50' : 'bg-gray-50/50'
-              } rounded-xl border border-gray-200 dark:border-gray-800`}
+              } rounded-xl border border-gray-700 dark:border-gray-800`}
             >
               <div className="relative w-full h-full overflow-hidden rounded-xl">
                 <Image 
