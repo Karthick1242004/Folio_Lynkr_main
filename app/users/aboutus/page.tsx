@@ -6,6 +6,7 @@ import { useStore } from '@/store/store';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { Clock } from 'lucide-react';
+import Link from 'next/link';
 
 export default function AboutUs() {
   const { isDark, isNavOpen, setIsNavOpen } = useStore();
@@ -151,13 +152,13 @@ export default function AboutUs() {
             }`}>
               Let's build something amazing together
             </p>
-            <button className={`px-8 py-3 rounded-full border ${
+            <Link href='/users/contactus' className={`px-8 py-3 rounded-full border ${
               isDark 
                 ? 'border-[#E0F01F] text-[#E0F01F] hover:bg-[#E0F01F] hover:text-black' 
                 : 'border-[#1F67F0] text-[#1F67F0] hover:bg-[#1F67F0] hover:text-white'
             } transition-all duration-300`}>
               Contact Us
-            </button>
+            </Link>
           </motion.div>
         </div>
         <div className='text-center mt-16'>
