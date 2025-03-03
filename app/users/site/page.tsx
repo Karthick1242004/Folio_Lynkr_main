@@ -87,7 +87,7 @@ export default function Page() {
   }
 
   return (
-    <div className={`${isDark ? 'bg-[#121212]' : 'bg-[#F0F0F0]'}`}>
+    <div className={`min-h-screen ${isDark ? 'bg-[#121212]' : 'bg-[#F0F0F0]'}`}>
       <PageNavigation 
         isOpen={isNavOpen} 
         onClose={() => setIsNavOpen(false)} 

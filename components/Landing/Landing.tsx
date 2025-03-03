@@ -34,7 +34,7 @@ export function Landing() {
   }, []);
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${isDark ? 'dark bg-[#121212]' : 'bg-[#F0F0F0]'}`}>
+    <div className={`transition-colors duration-300 ${isDark ? 'dark bg-[#121212]' : 'bg-[#F0F0F0]'}`}>
       <div className="max-w-4xl mx-auto px-4 py-4 sm:py-6">
         <header className="flex justify-between items-center mb-10 sm:mb-header-spacing">
           <button className="p-1 sm:p-2" onClick={() => setIsNavOpen(true)} title="Menu">
@@ -90,11 +90,11 @@ export function Landing() {
             </div>
           </div>
           <p className=' text-gray-500 text-[10px] mt-6 font-normal dark:text-gray-400 p-2 fontcss tracking-widest flex text-center mx-auto gap-2'>Scroll Down</p>
-          <div className='absolute bottom-0'>
+          {/* <div className='absolute bottom-0'>
            <p className="text-gray-500 text-[10px] font-normal dark:text-gray-400 p-2 fontcss tracking-widest flex items-center gap-2">
             Powered by <a href='https://calibertech.vercel.app/'><span className={`font-medium text-black ${isDark ? 'text-gray-400' : 'text-black'}`}>@CaliberTech</span></a>
            </p> 
-          </div>
+          </div> */}
         </main>
       </div>
     </div>

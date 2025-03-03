@@ -214,7 +214,7 @@ export default function Page() {
     setIsNavOpen(false);
   },[])
   return (
-    <div className={`w-full pb-10 mx-auto px-6 ${isDark ? 'bg-[#121212]' : 'bg-[#F0F0F0]'}`}>
+    <div className={`w-full min-h-screen pb-10 mx-auto px-6 ${isDark ? 'bg-[#121212]' : 'bg-[#F0F0F0]'}`}>
       <PageNavigation 
         isOpen={isNavOpen} 
         onClose={() => setIsNavOpen(false)} 

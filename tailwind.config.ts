@@ -94,6 +94,12 @@ const config: Config = {
   		},
 		max400: {
 			max: '400px'
+		},
+		max900: {
+			max: '900px'
+		},
+		min1800:{
+			min: '1800px'
 		}
   	}
   },
