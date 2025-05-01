@@ -1,0 +1,1216 @@
+{
+  "forms": [
+    {
+      "id": 1,
+      "name": "Bento Portfolio",
+      "repo": "bento_portfolio",
+      "steps": [
+        {
+          "number": 1,
+          "title": "SITE DETAILS",
+          "fields": [
+            {
+              "name": "siteTitle",
+              "label": "Site Title",
+              "type": "text",
+              "placeholder": "Enter your site title"
+            },
+            {
+              "name": "subdomain",
+              "label": "Subdomain",
+              "type": "text",
+              "placeholder": "Enter your preferred subdomain",
+              "availability": true
+            }
+          ]
+        },
+        {
+          "number": 2,
+          "title": "SOCIAL LINKS",
+          "fields": [
+            {
+              "name": "socialLinks.github",
+              "label": "GitHub Profile",
+              "type": "text",
+              "placeholder": "https://github.com/yourusername"
+            },
+            {
+              "name": "socialLinks.linkedin",
+              "label": "LinkedIn Profile",
+              "type": "text",
+              "placeholder": "https://linkedin.com/in/yourusername"
+            },
+            {
+              "name": "socialLinks.leetcode",
+              "label": "LeetCode Profile",
+              "type": "text",
+              "placeholder": "https://leetcode.com/yourusername"
+            }
+          ]
+        },
+        {
+          "number": 3,
+          "title": "HERO SECTION",
+          "fields": [
+            {
+              "name": "hero.profileImage",
+              "label": "Profile Image",
+              "type": "image",
+              "placeholder": "Upload your profile image"
+            },
+            {
+              "name": "hero.name",
+              "label": "Your Name",
+              "type": "text",
+              "placeholder": "Enter your full name"
+            },
+            {
+              "name": "hero.title",
+              "label": "Your Title",
+              "type": "text",
+              "placeholder": "e.g., Full Stack Developer"
+            },
+            {
+              "name": "hero.description",
+              "label": "Brief Description",
+              "type": "textarea",
+              "placeholder": "Write a short description about yourself"
+            },
+            {
+              "name": "hero.featuredImage",
+              "label": "Featured Image",
+              "type": "image",
+              "placeholder": "Upload a featured image"
+            }
+          ]
+        },
+        {
+          "number": 4,
+          "title": "SERVICES",
+          "array": true,
+          "arrayName": "services",
+          "initialCount": 3,
+          "fields": [
+            {
+              "name": "title",
+              "label": "Service Title",
+              "type": "text",
+              "placeholder": "e.g., Web Development"
+            },
+            {
+              "name": "description",
+              "label": "Service Description",
+              "type": "textarea",
+              "placeholder": "Describe this service"
+            }
+          ]
+        },
+        {
+          "number": 5,
+          "title": "PROJECTS",
+          "array": true,
+          "arrayName": "testimonials",
+          "initialCount": 3,
+          "fields": [
+            {
+              "name": "quote",
+              "label": "Project Quote",
+              "type": "textarea",
+              "placeholder": "Brief description of the project"
+            },
+            {
+              "name": "author.name",
+              "label": "Project Name",
+              "type": "text",
+              "placeholder": "Project name"
+            },
+            {
+              "name": "author.title",
+              "label": "Project Technology",
+              "type": "text",
+              "placeholder": "e.g., React, Node.js"
+            },
+            {
+              "name": "author.image",
+              "label": "Project Logo",
+              "type": "image",
+              "placeholder": "Upload project logo"
+            },
+            {
+              "name": "image",
+              "label": "Project Image",
+              "type": "image",
+              "placeholder": "Upload project screenshot"
+            }
+          ]
+        },
+        {
+          "number": 6,
+          "title": "CONTACT INFO",
+          "fields": [
+            {
+              "name": "footer.contact.title",
+              "label": "Contact Section Title",
+              "type": "text",
+              "placeholder": "e.g., Get In Touch"
+            },
+            {
+              "name": "footer.contact.subtitle",
+              "label": "Contact Section Subtitle",
+              "type": "text",
+              "placeholder": "e.g., Let's work together"
+            },
+            {
+              "name": "footer.contact.email",
+              "label": "Email Address",
+              "type": "email",
+              "placeholder": "your.email@example.com"
+            }
+          ]
+        },
+        {
+          "number": 7,
+          "title": "ACADEMIC DETAILS",
+          "fields": [
+            {
+              "name": "footer.academic.title",
+              "label": "Academic Section Title",
+              "type": "text",
+              "placeholder": "e.g., Education"
+            }
+          ],
+          "array": true,
+          "arrayName": "footer.academic.qualifications",
+          "initialCount": 3,
+          "arrayFields": [
+            {
+              "name": "name",
+              "label": "Qualification Name",
+              "type": "text",
+              "placeholder": "e.g., Bachelor's in Computer Science"
+            },
+            {
+              "name": "href",
+              "label": "Institution Website",
+              "type": "text",
+              "placeholder": "https://example.edu"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "3D Interactive Portfolio",
+      "repo": "Ace_portfolio_lynkr",
+      "steps": [
+        {
+          "number": 1,
+          "title": "SITE DETAILS",
+          "fields": [
+            {
+              "name": "subdomain",
+              "label": "Subdomain",
+              "type": "text",
+              "placeholder": "Enter your preferred subdomain",
+              "availability": true
+            }
+          ]
+        },
+        {
+          "number": 2,
+          "title": "HERO SECTION",
+          "fields": [
+            {
+              "name": "hero.name",
+              "label": "Your Name",
+              "type": "text",
+              "placeholder": "Enter your full name"
+            },
+            {
+              "name": "hero.tagline",
+              "label": "Your Tagline",
+              "type": "text",
+              "placeholder": "e.g., Building digital experiences"
+            },
+            {
+              "name": "hero.resumeUrl",
+              "label": "Resume URL",
+              "type": "text",
+              "placeholder": "Link to your resume"
+            },
+            {
+              "name": "hero.resumeText",
+              "label": "Resume Button Text",
+              "type": "text",
+              "placeholder": "e.g., Download Resume"
+            }
+          ]
+        },
+        {
+          "number": 3,
+          "title": "PROJECTS",
+          "array": true,
+          "arrayName": "projects",
+          "initialCount": 1,
+          "canAdd": true,
+          "fields": [
+            {
+              "name": "projectName",
+              "label": "Project Name",
+              "type": "text",
+              "placeholder": "Enter project name"
+            },
+            {
+              "name": "projectType",
+              "label": "Project Type",
+              "type": "text",
+              "placeholder": "e.g., Web App, Mobile App"
+            },
+            {
+              "name": "projectContent",
+              "label": "Project Description",
+              "type": "textarea",
+              "placeholder": "Describe your project"
+            },
+            {
+              "name": "projectImage",
+              "label": "Project Image",
+              "type": "image",
+              "placeholder": "Upload project image"
+            },
+            {
+              "name": "projectUrl",
+              "label": "Project URL",
+              "type": "text",
+              "placeholder": "https://example.com/project"
+            },
+            {
+              "name": "githubUrl",
+              "label": "GitHub URL",
+              "type": "text",
+              "placeholder": "https://github.com/username/project"
+            }
+          ]
+        },
+        {
+          "number": 4,
+          "title": "SERVICES",
+          "array": true,
+          "arrayName": "services",
+          "initialCount": 3,
+          "fields": [
+            {
+              "name": "title",
+              "label": "Service Title",
+              "type": "text",
+              "placeholder": "e.g., Web Development"
+            },
+            {
+              "name": "description",
+              "label": "Service Description",
+              "type": "textarea",
+              "placeholder": "Describe this service"
+            }
+          ]
+        },
+        {
+          "number": 5,
+          "title": "TESTIMONIALS",
+          "array": true,
+          "arrayName": "testimonials",
+          "initialCount": 3,
+          "fields": [
+            {
+              "name": "name",
+              "label": "Person Name",
+              "type": "text",
+              "placeholder": "Enter name"
+            },
+            {
+              "name": "designation",
+              "label": "Designation",
+              "type": "text",
+              "placeholder": "e.g., CEO, Company Name"
+            },
+            {
+              "name": "content",
+              "label": "Testimonial Content",
+              "type": "textarea",
+              "placeholder": "Enter testimonial text"
+            }
+          ]
+        },
+        {
+          "number": 6,
+          "title": "CONTACTS",
+          "array": true,
+          "arrayName": "contacts",
+          "initialCount": 3,
+          "fields": [
+            {
+              "name": "name",
+              "label": "Contact Method",
+              "type": "text",
+              "placeholder": "e.g., Email, Phone, Twitter"
+            },
+            {
+              "name": "designation",
+              "label": "Contact Value",
+              "type": "text",
+              "placeholder": "e.g., your.email@example.com"
+            },
+            {
+              "name": "url",
+              "label": "Contact URL",
+              "type": "text",
+              "placeholder": "e.g., mailto:your.email@example.com"
+            }
+          ]
+        },
+        {
+          "number": 7,
+          "title": "TOP PROJECT",
+          "fields": [
+            {
+              "name": "top_project.title",
+              "label": "Feature Project Title",
+              "type": "text",
+              "placeholder": "Enter your top project title"
+            },
+            {
+              "name": "top_project.description",
+              "label": "Feature Project Description",
+              "type": "textarea",
+              "placeholder": "Describe your top project"
+            },
+            {
+              "name": "top_project.websiteUrl",
+              "label": "Project URL",
+              "type": "text",
+              "placeholder": "https://example.com/project"
+            },
+            {
+              "name": "top_project.websiteDisplay",
+              "label": "Website Display Text",
+              "type": "text",
+              "placeholder": "e.g., Visit Project"
+            }
+          ]
+        },
+        {
+          "number": 8,
+          "title": "SKILLSET",
+          "fields": [
+            {
+              "name": "skillset.image",
+              "label": "Skills Image",
+              "type": "image",
+              "placeholder": "Upload an image showcasing your skills"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "MacOS Portfolio",
+      "repo": "macos_portfolio",
+      "steps": [
+        {
+          "number": 1,
+          "title": "USER DETAILS",
+          "fields": [
+            {
+              "name": "personalInfo.name",
+              "label": "Full Name",
+              "type": "text",
+              "placeholder": "Enter your full name"
+            },
+            {
+              "name": "personalInfo.designation",
+              "label": "Job Title",
+              "type": "text",
+              "placeholder": "e.g., Frontend Developer"
+            },
+            {
+              "name": "personalInfo.resumeLink",
+              "label": "Resume URL",
+              "type": "url",
+              "placeholder": "Link to your resume"
+            },
+            {
+              "name": "subdomain",
+              "label": "Subdomain",
+              "type": "text",
+              "placeholder": "Enter your preferred subdomain",
+              "availability": true
+            }
+          ]
+        },
+        {
+          "number": 2,
+          "title": "WEBSITES",
+          "fields": [
+            {
+              "name": "contact.social.github",
+              "label": "GitHub URL",
+              "type": "url",
+              "placeholder": "https://github.com/yourusername"
+            },
+            {
+              "name": "contact.social.linkedin",
+              "label": "LinkedIn URL",
+              "type": "url",
+              "placeholder": "https://linkedin.com/in/yourusername"
+            },
+            {
+              "name": "contact.email",
+              "label": "Email Address",
+              "type": "email",
+              "placeholder": "your.email@example.com"
+            },
+            {
+              "name": "contact.phone",
+              "label": "Phone Number",
+              "type": "tel",
+              "placeholder": "Your phone number"
+            },
+            {
+              "name": "contact.location",
+              "label": "Location",
+              "type": "text",
+              "placeholder": "e.g., San Francisco, CA"
+            }
+          ]
+        },
+        {
+          "number": 3,
+          "title": "ABOUT ME",
+          "array": true,
+          "arrayName": "personalInfo.about",
+          "initialCount": 3,
+          "fields": [
+            {
+              "name": "",
+              "label": "About Paragraph",
+              "type": "textarea",
+              "placeholder": "Write a paragraph about yourself"
+            }
+          ]
+        },
+        {
+          "number": 4,
+          "title": "NOTES",
+          "array": true,
+          "arrayName": "projects",
+          "initialCount": 1,
+          "canAdd": true,
+          "fields": [
+            {
+              "name": "image",
+              "label": "Project Image",
+              "type": "image",
+              "placeholder": "Upload project image"
+            },
+            {
+              "name": "content",
+              "label": "Project Description",
+              "type": "textarea",
+              "placeholder": "Write about your project"
+            },
+            {
+              "name": "demoLink",
+              "label": "Demo URL",
+              "type": "url",
+              "placeholder": "https://example.com/project"
+            },
+            {
+              "name": "githubLink",
+              "label": "GitHub URL",
+              "type": "url",
+              "placeholder": "https://github.com/username/project"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Image Gallery Portfolio",
+      "repo": "shadcn_bento_folio",
+      "steps": [
+        {
+          "number": 1,
+          "title": "USER DETAILS",
+          "fields": [
+            {
+              "name": "personalInfo.name",
+              "label": "Full Name",
+              "type": "text",
+              "placeholder": "Enter your full name"
+            },
+            {
+              "name": "personalInfo.designation",
+              "label": "Job Title",
+              "type": "text",
+              "placeholder": "e.g., Frontend Developer"
+            },
+            {
+              "name": "personalInfo.resumeLink",
+              "label": "Resume URL",
+              "type": "url",
+              "placeholder": "Link to your resume"
+            },
+            {
+              "name": "subdomain",
+              "label": "Subdomain",
+              "type": "text",
+              "placeholder": "Enter your preferred subdomain",
+              "availability": true
+            }
+          ]
+        },
+        {
+          "number": 2,
+          "title": "EDUCATION",
+          "array": true,
+          "arrayName": "education",
+          "initialCount": 3,
+          "fields": [
+            {
+              "name": "institution",
+              "label": "Institution Name",
+              "type": "text",
+              "placeholder": "Enter institution name"
+            },
+            {
+              "name": "degree",
+              "label": "Degree/Certificate",
+              "type": "text",
+              "placeholder": "e.g., Bachelor of Science in Computer Science"
+            },
+            {
+              "name": "score",
+              "label": "Score/GPA",
+              "type": "text",
+              "placeholder": "e.g., 3.8/4.0"
+            },
+            {
+              "name": "duration",
+              "label": "Duration",
+              "type": "text",
+              "placeholder": "e.g., 2018-2022"
+            }
+          ]
+        },
+        {
+          "number": 3,
+          "title": "CONTACT INFO",
+          "fields": [
+            {
+              "name": "contact.email",
+              "label": "Email",
+              "type": "email",
+              "placeholder": "your.email@example.com"
+            },
+            {
+              "name": "contact.phone",
+              "label": "Phone",
+              "type": "tel",
+              "placeholder": "Your phone number"
+            },
+            {
+              "name": "contact.location",
+              "label": "Location",
+              "type": "text",
+              "placeholder": "e.g., San Francisco, CA"
+            },
+            {
+              "name": "contact.social.github",
+              "label": "GitHub URL",
+              "type": "url",
+              "placeholder": "https://github.com/yourusername"
+            },
+            {
+              "name": "contact.social.linkedin",
+              "label": "LinkedIn URL",
+              "type": "url",
+              "placeholder": "https://linkedin.com/in/yourusername"
+            }
+          ]
+        },
+        {
+          "number": 4,
+          "title": "PROJECTS",
+          "array": true,
+          "arrayName": "projects",
+          "initialCount": 1,
+          "canAdd": true,
+          "fields": [
+            {
+              "name": "image",
+              "label": "Project Image",
+              "type": "image",
+              "placeholder": "Upload project image"
+            },
+            {
+              "name": "content",
+              "label": "Project Description",
+              "type": "textarea",
+              "placeholder": "Write about your project"
+            },
+            {
+              "name": "demoLink",
+              "label": "Demo URL",
+              "type": "url",
+              "placeholder": "https://example.com/project"
+            },
+            {
+              "name": "githubLink",
+              "label": "GitHub URL",
+              "type": "url",
+              "placeholder": "https://github.com/username/project"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Modern Portfolio",
+      "repo": "framer_portfolio_folio",
+      "steps": [
+        {
+          "number": 1,
+          "title": "SITE DETAILS",
+          "description": "Enter your site details",
+          "fields": [
+            {
+              "name": "subdomain",
+              "label": "Subdomain",
+              "type": "text",
+              "placeholder": "Enter subdomain",
+              "availability": true
+            }
+          ]
+        },
+        {
+          "number": 2,
+          "title": "PERSONAL INFO",
+          "description": "Enter your personal information",
+          "fields": [
+            {
+              "name": "personalInfo.profileImage",
+              "label": "Profile Image",
+              "type": "image",
+              "placeholder": "Upload your profile image"
+            },
+            {
+              "name": "personalInfo.name",
+              "label": "Name",
+              "type": "text",
+              "placeholder": "Enter your name"
+            },
+            {
+              "name": "personalInfo.initial",
+              "label": "Initial",
+              "type": "text",
+              "placeholder": "Enter your initial"
+            },
+            {
+              "name": "personalInfo.email",
+              "label": "Email",
+              "type": "email",
+              "placeholder": "Enter your email"
+            },
+            {
+              "name": "personalInfo.designation",
+              "label": "Designation",
+              "type": "text",
+              "placeholder": "Enter your designation"
+            },
+            {
+              "name": "personalInfo.tagline",
+              "label": "Tagline",
+              "type": "text",
+              "placeholder": "Enter your tagline"
+            },
+            {
+              "name": "personalInfo.about",
+              "label": "About",
+              "type": "textarea",
+              "placeholder": "Tell us about yourself",
+              "rows": 4
+            },
+            {
+              "name": "stats.experience",
+              "label": "Experience",
+              "type": "text",
+              "placeholder": "e.g., 8+"
+            },
+            {
+              "name": "stats.clients",
+              "label": "Clients",
+              "type": "text",
+              "placeholder": "e.g., 20+"
+            },
+            {
+              "name": "stats.projects",
+              "label": "Projects",
+              "type": "text",
+              "placeholder": "e.g., 40+"
+            },
+            {
+              "name": "stats.developmentHours",
+              "label": "Development Hours",
+              "type": "text",
+              "placeholder": "e.g., 10,000+"
+            }
+          ]
+        },
+        {
+          "number": 3,
+          "title": "PROJECTS",
+          "description": "Add your projects",
+          "array": true,
+          "arrayName": "projects",
+          "initialCount": 4,
+          "canAdd": true,
+          "fields": [
+            {
+              "name": "title",
+              "label": "Project Title",
+              "type": "text",
+              "placeholder": "Enter project title"
+            },
+            {
+              "name": "year",
+              "label": "Year",
+              "type": "text",
+              "placeholder": "Enter project year"
+            },
+            {
+              "name": "image",
+              "label": "Project Image",
+              "type": "image",
+              "placeholder": "Upload project image"
+            },
+            {
+              "name": "description",
+              "label": "Description",
+              "type": "textarea",
+              "placeholder": "Enter project description",
+              "rows": 3
+            },
+            {
+              "name": "category",
+              "label": "Category",
+              "type": "text",
+              "placeholder": "Enter project category"
+            },
+            {
+              "name": "visitLink",
+              "label": "Visit Link",
+              "type": "url",
+              "placeholder": "Enter project URL"
+            }
+          ]
+        },
+        {
+          "number": 4,
+          "title": "CAREER HISTORY",
+          "description": "Add your work experience",
+          "array": true,
+          "arrayName": "careerHistory",
+          "initialCount": 3,
+          "canAdd": true,
+          "fields": [
+            {
+              "name": "title",
+              "label": "Position Title",
+              "type": "text",
+              "placeholder": "Enter position title"
+            },
+            {
+              "name": "company",
+              "label": "Company",
+              "type": "text",
+              "placeholder": "Enter company name"
+            },
+            {
+              "name": "period",
+              "label": "Period",
+              "type": "text",
+              "placeholder": "e.g., 2020 - 2022"
+            },
+            {
+              "name": "description",
+              "label": "Description",
+              "type": "textarea",
+              "placeholder": "Enter job description",
+              "rows": 3
+            }
+          ]
+        },
+        {
+          "number": 5,
+          "title": "FAQs",
+          "description": "Add frequently asked questions",
+          "array": true,
+          "arrayName": "faqs",
+          "initialCount": 4,
+          "fields": [
+            {
+              "name": "question",
+              "label": "Question",
+              "type": "text",
+              "placeholder": "Enter FAQ question"
+            },
+            {
+              "name": "answer",
+              "label": "Answer",
+              "type": "textarea",
+              "placeholder": "Enter FAQ answer",
+              "rows": 3
+            }
+          ]
+        },
+        {
+          "number": 6,
+          "title": "SOCIAL LINKS",
+          "description": "Add your social media links",
+          "fields": [
+            {
+              "name": "social.twitter",
+              "label": "Twitter URL",
+              "type": "url",
+              "placeholder": "Enter Twitter profile URL"
+            },
+            {
+              "name": "social.instagram",
+              "label": "Instagram URL",
+              "type": "url",
+              "placeholder": "Enter Instagram profile URL"
+            },
+            {
+              "name": "social.linkedin",
+              "label": "LinkedIn URL",
+              "type": "url",
+              "placeholder": "Enter LinkedIn profile URL"
+            },
+            {
+              "name": "social.behance",
+              "label": "Behance URL",
+              "type": "url",
+              "placeholder": "Enter Behance profile URL"
+            }
+          ]
+        },
+        {
+          "number": 7,
+          "title": "FOOTER",
+          "description": "Customize your footer",
+          "fields": [
+            {
+              "name": "footer.copyright",
+              "label": "Copyright Text",
+              "type": "text",
+              "placeholder": "Enter copyright text"
+            },
+            {
+              "name": "footer.creator",
+              "label": "Creator Name",
+              "type": "text",
+              "placeholder": "Enter creator name"
+            },
+            {
+              "name": "footer.technology",
+              "label": "Technology Used",
+              "type": "text",
+              "placeholder": "Enter technology used"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Hero Section Portfolio",
+      "repo": "hero_portfolio_folio",
+      "steps": [
+        {
+          "number": 1,
+          "title": "PERSONAL INFO",
+          "description": "Enter your personal information",
+          "fields": [
+            {
+              "name": "subdomain",
+              "label": "Subdomain",
+              "type": "text",
+              "placeholder": "Enter subdomain",
+              "availability": true
+            },
+            {
+              "name": "personalInfo.name",
+              "label": "Name",
+              "type": "text",
+              "placeholder": "Enter your name"
+            },
+            {
+              "name": "personalInfo.title",
+              "label": "Professional Title",
+              "type": "text",
+              "placeholder": "e.g., Full Stack Developer"
+            },
+            {
+              "name": "personalInfo.status",
+              "label": "Status",
+              "type": "text",
+              "placeholder": "e.g., Available for hiring"
+            },
+            {
+              "name": "personalInfo.tagline",
+              "label": "Tagline",
+              "type": "text",
+              "placeholder": "A brief professional tagline"
+            },
+            {
+              "name": "personalInfo.shortBio",
+              "label": "Short Bio",
+              "type": "textarea",
+              "placeholder": "A short bio about yourself",
+              "rows": 3
+            },
+            {
+              "name": "personalInfo.resumeUrl",
+              "label": "Resume URL",
+              "type": "url",
+              "placeholder": "Link to your resume"
+            },
+            {
+              "name": "personalInfo.detailedBio.intro",
+              "label": "Detailed Bio Introduction",
+              "type": "textarea",
+              "placeholder": "A more detailed introduction about yourself",
+              "rows": 4
+            }
+          ]
+        },
+        {
+          "number": 2,
+          "title": "CONTACT",
+          "description": "Enter your contact details",
+          "fields": [
+            {
+              "name": "contact.email",
+              "label": "Email",
+              "type": "email",
+              "placeholder": "Your email address"
+            },
+            {
+              "name": "contact.socialLinks.github",
+              "label": "GitHub URL",
+              "type": "url",
+              "placeholder": "Your GitHub profile URL"
+            },
+            {
+              "name": "contact.socialLinks.linkedin",
+              "label": "LinkedIn URL",
+              "type": "url",
+              "placeholder": "Your LinkedIn profile URL"
+            },
+            {
+              "name": "contact.socialLinks.instagram",
+              "label": "Instagram URL",
+              "type": "url",
+              "placeholder": "Your Instagram profile URL"
+            },
+            {
+              "name": "contact.contactText",
+              "label": "Contact Text",
+              "type": "text",
+              "placeholder": "Brief contact invitation text"
+            },
+            {
+              "name": "contact.contactDescription",
+              "label": "Contact Description",
+              "type": "textarea",
+              "placeholder": "Detailed description about contacting you",
+              "rows": 3
+            }
+          ]
+        },
+        {
+          "number": 3,
+          "title": "EDUCATION TIMELINE",
+          "description": "Add your education and achievements",
+          "fields": [
+            {
+              "name": "timeline.education",
+              "label": "Education",
+              "type": "array",
+              "arrayFields": [
+                {
+                  "name": "date",
+                  "label": "Date",
+                  "type": "text",
+                  "placeholder": "e.g., 2021 - 2025"
+                },
+                {
+                  "name": "title",
+                  "label": "Degree/Title",
+                  "type": "text",
+                  "placeholder": "e.g., BE in Computer Science"
+                },
+                {
+                  "name": "institution",
+                  "label": "Institution",
+                  "type": "text",
+                  "placeholder": "e.g., University of Technology"
+                },
+                {
+                  "name": "description",
+                  "label": "Description",
+                  "type": "textarea",
+                  "placeholder": "Description of your education",
+                  "rows": 3
+                },
+                {
+                  "name": "category",
+                  "label": "Category",
+                  "type": "hidden",
+                  "value": "education"
+                }
+              ],
+              "initialCount": 1,
+              "canAdd": true
+            },
+            {
+              "name": "timeline.achievements",
+              "label": "Achievements",
+              "type": "array",
+              "arrayFields": [
+                {
+                  "name": "date",
+                  "label": "Date",
+                  "type": "text",
+                  "placeholder": "e.g., 2020"
+                },
+                {
+                  "name": "title",
+                  "label": "Achievement Title",
+                  "type": "text",
+                  "placeholder": "e.g., Best Developer Award"
+                },
+                {
+                  "name": "organization",
+                  "label": "Organization",
+                  "type": "text",
+                  "placeholder": "e.g., TechConf 2020"
+                },
+                {
+                  "name": "description",
+                  "label": "Description",
+                  "type": "textarea",
+                  "placeholder": "Description of your achievement",
+                  "rows": 3
+                },
+                {
+                  "name": "category",
+                  "label": "Category",
+                  "type": "hidden",
+                  "value": "achievement"
+                }
+              ],
+              "initialCount": 1,
+              "canAdd": true
+            }
+          ]
+        },
+        {
+          "number": 4,
+          "title": "PROJECTS",
+          "description": "Add your projects",
+          "array": true,
+          "arrayName": "projects",
+          "initialCount": 1,
+          "canAdd": true,
+          "fields": [
+            {
+              "name": "title",
+              "label": "Project Title",
+              "type": "text",
+              "placeholder": "Enter project title"
+            },
+            {
+              "name": "description",
+              "label": "Short Description",
+              "type": "text",
+              "placeholder": "Brief project description"
+            },
+            {
+              "name": "fullDescription",
+              "label": "Full Description",
+              "type": "textarea",
+              "placeholder": "Detailed project description",
+              "rows": 3
+            },
+            {
+              "name": "date",
+              "label": "Date",
+              "type": "text",
+              "placeholder": "e.g., 2024"
+            },
+            {
+              "name": "icon",
+              "label": "Icon",
+              "type": "text",
+              "placeholder": "e.g., Code, Play, Brain"
+            },
+            {
+              "name": "color",
+              "label": "Color",
+              "type": "text",
+              "placeholder": "e.g., blue, red, green"
+            },
+            {
+              "name": "image",
+              "label": "Project Image",
+              "type": "image",
+              "placeholder": "Upload project image"
+            },
+            {
+              "name": "stack",
+              "label": "Tech Stack",
+              "type": "array",
+              "placeholder": "Add technology",
+              "initialCount": 1,
+              "canAdd": true
+            },
+            {
+              "name": "features",
+              "label": "Features",
+              "type": "array",
+              "placeholder": "Add feature",
+              "initialCount": 1,
+              "canAdd": true
+            },
+            {
+              "name": "demoLink",
+              "label": "Demo Link",
+              "type": "url",
+              "placeholder": "Link to live demo"
+            },
+            {
+              "name": "githubLink",
+              "label": "GitHub Link",
+              "type": "url",
+              "placeholder": "Link to GitHub repository"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+} 

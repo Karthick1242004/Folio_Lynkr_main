@@ -596,7 +596,7 @@ function Page() {
       case 5:
         return (
           <div className="space-y-4 !h-[370px] overflow-y-scroll">
-            <h2 className="text-xl font-semibold">Testimonials</h2>
+            <h2 className="text-xl font-semibold">Projects</h2>
             {[0, 1, 2].map((index) => (
               <div key={index} className="space-y-2 p-4 border rounded">
                 <FormInput 

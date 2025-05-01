@@ -8,13 +8,12 @@
       "amount": "449",
       "imageUrl": "/bentofolio.png",
       "visitUrl": "https://kanisha.vercel.app/",
-      "formUrl": "/users/Form",
       "steps": [
         { "number": 1, "title": "SITE DETAILS" },
         { "number": 2, "title": "SOCIAL LINKS" },
         { "number": 3, "title": "HERO SECTION" },
         { "number": 4, "title": "SERVICES" },
-        { "number": 5, "title": "TESTIMONAILS" },
+        { "number": 5, "title": "PROJECTS" },
         { "number": 6, "title": "CONTACT INFO" },
         { "number": 7, "title": "ACADEMIC DETAILS" }
       ]
@@ -27,7 +26,6 @@
       "amount": "799",
       "imageUrl": "/Ace_portfolio.png",
       "visitUrl": "https://karthickrajans.vercel.app/",
-      "formUrl": "/users/Form2",
       "steps": [
         { "number": 1, "title": "SITE DETAILS" },
         { "number": 2, "title": "HERO SECTION" },
@@ -47,7 +45,6 @@
       "amount": "499",
       "imageUrl": "/macos_portfolio.png",
       "visitUrl": "https://caliber-macos-portfolio.netlify.app/",
-      "formUrl": "/users/Form3",
       "steps": [
         { "number": 1, "title": "USER DETAILS" },
         { "number": 2, "title": "WEBSITES" },
@@ -63,7 +60,6 @@
       "amount": "699",
       "imageUrl": "/image-gallery.png",
       "visitUrl": "https://image-gallery-folio-lynkr.netlify.app/",
-      "formUrl": "/users/Form4",
       "steps": [
         { "number": 1, "title": "USER DETAILS" },
         { "number": 2, "title": "EDUCATION" },
@@ -79,7 +75,6 @@
       "amount": "799",
       "imageUrl": "/framer-portfolio.png",
       "visitUrl": "https://dark-portfolio-folio-lynkr.netlify.app/",
-      "formUrl": "/users/Form5",
       "steps": [
         { "number": 1, "title": "SITE DETAILS" },
         { "number": 2, "title": "PEROSNAL INFO" },
@@ -88,6 +83,36 @@
         { "number": 5, "title": "FAQs" },
         { "number": 6, "title": "SOCIAL LINKS" },
         { "number": 7, "title": "FOOTER" }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Hero Section Portfolio",
+      "description": "A portfolio with a animated hero section which works bsaed on the mouse interaction created by the user which provides various unique colors in the screen",
+      "builtWith": "REACT JS",
+      "amount": "899",
+      "imageUrl": "/hero-folio.png",
+      "visitUrl": "https://hero-folio-lynkr.netlify.app/",
+      "steps": [
+        { "number": 1, "title": "PERSONAL INFO" },
+        { "number": 2, "title": "CONTACT" },
+        { "number": 3, "title": "EDUCATION TIMELINE" },
+        { "number": 4, "title": "PROJECTS" }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "StartUp Website",
+      "description": "A website for a startup company with a clean and modern design. Features like a hero section, about us section, services section, contact section, and a footer are implemented with responsive design.",
+      "builtWith": "NEXT JS",
+      "amount": "1999",
+      "imageUrl": "/your-company.png",
+      "visitUrl": "https://your-company-name.vercel.app/",
+      "steps": [
+        { "number": 1, "title": "PERSONAL INFO" },
+        { "number": 2, "title": "CONTACT" },
+        { "number": 3, "title": "EDUCATION TIMELINE" },
+        { "number": 4, "title": "PROJECTS" }
       ]
     }
   ]

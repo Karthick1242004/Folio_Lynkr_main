@@ -11,6 +11,12 @@
           "overscroll-behavior"
         ]
       }
+    ],
+    "axe/forms": [
+      "default",
+      {
+        "label": "off"
+      }
     ]
   }
 }

@@ -55,7 +55,7 @@ export default function Page() {
     if (!session) {
       signIn('google')
     } else {
-      window.location.href = currentSite.formUrl
+      window.location.href = `/users/form-builder?siteId=${currentSite.id}&formId=${currentSite.id}`
     }
   }
 

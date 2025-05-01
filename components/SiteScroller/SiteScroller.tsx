@@ -16,11 +16,11 @@ export default function SiteScroller() {
   
   return (
     <div className="p-2 max-w-[1600px] min1800:max-w-[2000px] mx-auto">
-      <div className="grid grid-cols-3 gap-1 min1800:grid-cols-5 max800:grid-cols-1">
+      <div className="grid grid-cols-3 !gap-1 justify-items-center  min1800:grid-cols-5 max800:grid-cols-1">
         {data.sites.map((site) => (
           <div 
             key={site.id} 
-            className="relative overflow-hidden rounded-xl transition-transform duration-300 "
+            className="relative overflow-hidden w-full rounded-xl transition-transform duration-300 "
           >
             <div 
               onClick={() => handleSiteClick(site.id)}
