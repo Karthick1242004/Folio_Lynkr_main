@@ -16,8 +16,22 @@ import { PageNavigation } from '@/components/FormpageNav/PageNavigation';
 import { get, set, cloneDeep, merge } from 'lodash';
 import confetti from 'canvas-confetti';
 
+// Declare the global window property
+declare global {
+  interface Window {
+    __UPLOADED_CLOUDINARY_URLS?: Map<string, string>;
+  }
+}
+
 type DynamicObject = {
   [key: string]: any;
+};
+
+// Define temporary file type
+type TempFile = {
+  file: File;
+  preview: string;
+  path: string;
 };
 
 // Define field type
@@ -66,6 +80,22 @@ export function DynamicForm({ formId, siteId }: DynamicFormProps) {
   const [isNavOpen, setIsNavOpen] = useState(false);
   const router = useRouter();
   
+  // Add state for temporary files
+  const [tempFiles, setTempFiles] = useState<TempFile[]>([]);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  
+  // Cleanup object URLs when component unmounts
+  useEffect(() => {
+    return () => {
+      // Revoke all object URLs to prevent memory leaks
+      tempFiles.forEach(tempFile => {
+        if (tempFile.preview) {
+          URL.revokeObjectURL(tempFile.preview);
+        }
+      });
+    };
+  }, [tempFiles]);
+  
   // Get form metadata
   const formMeta = formMetadata.forms.find(form => form.id === formId);
   if (!formMeta) {
@@ -98,8 +128,36 @@ export function DynamicForm({ formId, siteId }: DynamicFormProps) {
       }
     };
     
-    // Initialize arrays based on metadata
+    // Process each step to build the correct data structure
     formMeta.steps.forEach((step: Step) => {
+      // Handle regular fields
+      if (!step.array) {
+        step.fields.forEach((field: Field) => {
+          // Skip subdomain field as it's handled separately
+          if (field.name !== 'subdomain') {
+            // Create any nested objects if needed
+            if (field.name.includes('.')) {
+              const parts = field.name.split('.');
+              let current = defaultData;
+              
+              // Create parent objects if needed
+              for (let i = 0; i < parts.length - 1; i++) {
+                if (!current[parts[i]]) {
+                  current[parts[i]] = {};
+                }
+                current = current[parts[i]];
+              }
+              
+              // Set the value
+              current[parts[parts.length - 1]] = '';
+            } else {
+              defaultData[field.name] = '';
+            }
+          }
+        });
+      }
+      
+      // Handle array fields
       if (step.array && step.arrayName) {
         const initialCount = step.initialCount || 1;
         const arrayName = step.arrayName;
@@ -121,7 +179,22 @@ export function DynamicForm({ formId, siteId }: DynamicFormProps) {
             const fieldsToUse = step.arrayFields || step.fields;
             
             fieldsToUse.forEach((field: Field) => {
-              set(item, field.name, '');
+              if (field.name.includes('.')) {
+                // Handle nested fields within array items
+                const fieldParts = field.name.split('.');
+                let currentItem = item;
+                
+                for (let i = 0; i < fieldParts.length - 1; i++) {
+                  if (!currentItem[fieldParts[i]]) {
+                    currentItem[fieldParts[i]] = {};
+                  }
+                  currentItem = currentItem[fieldParts[i]];
+                }
+                
+                currentItem[fieldParts[fieldParts.length - 1]] = '';
+              } else {
+                item[field.name] = '';
+              }
             });
             
             return item;
@@ -131,8 +204,26 @@ export function DynamicForm({ formId, siteId }: DynamicFormProps) {
           defaultData[arrayName] = Array(initialCount).fill(null).map(() => {
             const item: DynamicObject = {};
             
-            step.fields.forEach((field: Field) => {
-              set(item, field.name, '');
+            // Use arrayFields if defined, otherwise use fields
+            const fieldsToUse = step.arrayFields || step.fields;
+            
+            fieldsToUse.forEach((field: Field) => {
+              if (field.name.includes('.')) {
+                // Handle nested fields within array items
+                const fieldParts = field.name.split('.');
+                let currentItem = item;
+                
+                for (let i = 0; i < fieldParts.length - 1; i++) {
+                  if (!currentItem[fieldParts[i]]) {
+                    currentItem[fieldParts[i]] = {};
+                  }
+                  currentItem = currentItem[fieldParts[i]];
+                }
+                
+                currentItem[fieldParts[fieldParts.length - 1]] = '';
+              } else {
+                item[field.name] = '';
+              }
             });
             
             return item;
@@ -209,6 +300,151 @@ export function DynamicForm({ formId, siteId }: DynamicFormProps) {
     });
   };
   
+  // Function to check file size (max 1.5MB)
+  const validateFileSize = (file: File): boolean => {
+    const maxSize = 1.5 * 1024 * 1024; // 1.5MB in bytes
+    if (file.size > maxSize) {
+      setUploadError(`File size exceeds 1.5MB limit (${(file.size / (1024 * 1024)).toFixed(2)}MB)`);
+      return false;
+    }
+    setUploadError(null);
+    return true;
+  };
+
+  // Handle image selection (stores locally without uploading to Cloudinary)
+  const handleImageSelection = (fieldPath: string) => (event: any) => {
+    if (event.target?.files?.[0]) {
+      const file = event.target.files[0];
+      
+      if (!validateFileSize(file)) return;
+      
+      // Create a temporary file object with preview URL
+      const preview = URL.createObjectURL(file);
+      console.log(`Created blob URL for ${fieldPath}: ${preview}`);
+      
+      // Store the file information
+      setTempFiles(prev => {
+        // Remove any existing temp file for this field
+        const filtered = prev.filter(item => item.path !== fieldPath);
+        return [...filtered, { file, preview, path: fieldPath }];
+      });
+      
+      // Update the form data with the preview URL for display purposes
+      setFormData(prev => {
+        const newFormData = cloneDeep(prev);
+        set(newFormData, fieldPath, preview);
+        return newFormData;
+      });
+    }
+  };
+  
+  // Handle array image selection
+  const handleArrayImageSelection = (arrayName: string, index: number, fieldName: string) => (event: any) => {
+    if (event.target?.files?.[0]) {
+      const file = event.target.files[0];
+      
+      if (!validateFileSize(file)) return;
+      
+      // Create a temporary file object with preview URL
+      const preview = URL.createObjectURL(file);
+      const path = `${arrayName}[${index}].${fieldName}`;
+      console.log(`Created blob URL for ${path}: ${preview}`);
+      
+      // Store the file information
+      setTempFiles(prev => {
+        // Remove any existing temp file for this field
+        const filtered = prev.filter(item => item.path !== path);
+        return [...filtered, { file, preview, path }];
+      });
+      
+      // Update the form data with the preview URL for display purposes
+      setFormData(prev => {
+        const newFormData = cloneDeep(prev);
+        set(newFormData, path, preview);
+        return newFormData;
+      });
+    }
+  };
+  
+  // Upload all stored temp files to Cloudinary
+  const uploadAllFiles = async (): Promise<boolean> => {
+    if (tempFiles.length === 0) return true;
+    
+    try {
+      setLoading(true);
+      const uploadPromises = tempFiles.map(async (tempFile) => {
+        const formData = new FormData();
+        formData.append('file', tempFile.file);
+        formData.append('upload_preset', 'my_uploads');
+        
+        console.log(`Uploading file for path: ${tempFile.path}`);
+        const response = await fetch(`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`, {
+          method: 'POST',
+          body: formData
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Failed to upload ${tempFile.file.name}`);
+        }
+        
+        const data = await response.json();
+        console.log(`Upload successful for ${tempFile.path}:`, data.secure_url);
+        return { path: tempFile.path, url: data.secure_url, blob: tempFile.preview };
+      });
+      
+      try {
+        const uploadResults = await Promise.all(uploadPromises);
+        console.log('All upload results:', uploadResults);
+        
+        // Create a map of paths to Cloudinary URLs for later use
+        const uploadedUrls = new Map();
+        uploadResults.forEach(({ path, url }) => {
+          uploadedUrls.set(path, url);
+        });
+        
+        // Map of blob URLs to Cloudinary URLs for reference
+        const blobToCloudinaryMap = new Map();
+        uploadResults.forEach(result => {
+          blobToCloudinaryMap.set(result.blob, result.url);
+        });
+        
+        // Update form data with real cloudinary URLs (use a single state update)
+        const updatedFormData = cloneDeep(formData);
+        uploadResults.forEach(({ path, url }) => {
+          console.log(`Setting ${path} to ${url}`);
+          set(updatedFormData, path, url);
+        });
+        
+        // Update the state once with all changes
+        setFormData(updatedFormData);
+        
+        // Store the updated data in a variable for direct use
+        // (don't rely on checking formData state which might not be updated yet)
+        const formDataForSubmission = updatedFormData;
+        
+        // Clear temp files as they've been uploaded
+        setTempFiles([]);
+        
+        // Ensure we're using the updated data for submission
+        console.log('Form data after updates:', formDataForSubmission);
+        
+        // Store the uploaded URLs for later use in the handleSubmit function
+        window.__UPLOADED_CLOUDINARY_URLS = uploadedUrls;
+        
+        return true;
+      } catch (uploadError) {
+        console.error("Error in Promise.all for uploads:", uploadError);
+        throw uploadError;
+      }
+    } catch (error) {
+      console.error('Error uploading files:', error);
+      alert('Failed to upload images. Please try again.');
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+  
   // Handle form submission
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -234,18 +470,157 @@ export function DynamicForm({ formId, siteId }: DynamicFormProps) {
       return;
     }
 
+    // Check if payment is complete
+    if (!isPaymentComplete) {
+      alert('Please complete the payment first');
+      return;
+    }
+
     const userId = session.user.name;
     
     // If email is missing, use a default format
     const userEmail = session.user?.email || `${session.user.name}@github.com`;
     
-    const data = {
-      ...formData,
-      subdomain,
-    };
-    
     try {
       setLoading(true);
+      
+      // First, upload all images to Cloudinary
+      const uploadSuccess = await uploadAllFiles();
+      if (!uploadSuccess) {
+        setLoading(false);
+        return; // Stop if uploads failed
+      }
+
+      // Wait a bit for any state updates to complete
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      // Create a deep copy of the current form data
+      const submissionData = cloneDeep(formData);
+      
+      // Add subdomain to the submission data
+      submissionData.subdomain = subdomain;
+      
+      // Apply the stored Cloudinary URLs directly to ensure they're included
+      const uploadedUrls = window.__UPLOADED_CLOUDINARY_URLS as Map<string, string> || new Map();
+      uploadedUrls.forEach((url, path) => {
+        set(submissionData, path, url);
+      });
+      
+      console.log('Form data with directly applied URLs:', submissionData);
+
+      // Find all image fields in the form meta
+      const imageFields: string[] = [];
+      formMeta.steps.forEach((step: Step) => {
+        // Standard fields
+        step.fields.forEach((field: Field) => {
+          if (field.type === 'image') {
+            imageFields.push(field.name);
+          }
+        });
+
+        // Array fields
+        if (step.array && step.arrayName) {
+          const fieldsToUse = step.arrayFields || step.fields;
+          fieldsToUse.forEach((field: Field) => {
+            if (field.type === 'image') {
+              // For arrays, we'll handle this during the cleaning phase
+              imageFields.push(`${step.arrayName}[*].${field.name}`);
+            }
+          });
+        }
+      });
+
+      console.log('Found image fields:', imageFields);
+
+      // A more robust cleaning function that preserves valid image URLs
+      const cleanData = (obj: any): any => {
+        if (!obj || typeof obj !== 'object') return obj;
+        
+        if (Array.isArray(obj)) {
+          return obj.map((item, index) => {
+            const result = cleanData(item);
+            return result;
+          });
+        }
+        
+        const result: DynamicObject = {};
+        
+        Object.keys(obj).forEach(key => {
+          const value = obj[key];
+          
+          if (typeof value === 'string') {
+            // Check if this is a blob URL
+            if (value.startsWith('blob:')) {
+              // For blobs, try to find the corresponding Cloudinary URL in our map
+              for (const [path, url] of uploadedUrls.entries()) {
+                if (path.endsWith(`.${key}`) || path === key) {
+                  console.log(`Replacing blob URL in ${key} with Cloudinary URL: ${url}`);
+                  result[key] = url;
+                  return;
+                }
+              }
+              // If we didn't find a match, set to empty string for image fields
+              const isImageKey = key === 'image' || key === 'profileImage' || 
+                                 key === 'featuredImage' || key.endsWith('.image');
+              result[key] = isImageKey ? '' : value;
+            } else if (value.includes('cloudinary.com')) {
+              // Preserve all Cloudinary URLs
+              result[key] = value;
+            } else {
+              // Other strings
+              result[key] = value;
+            }
+          } else if (typeof value === 'object') {
+            result[key] = cleanData(value);
+          } else {
+            result[key] = value;
+          }
+        });
+        
+        return result;
+      };
+      
+      // Clean the data
+      const cleanedData = cleanData(submissionData);
+      
+      // Special handling for array image fields (which are harder to check)
+      imageFields.forEach(field => {
+        if (field.includes('[*].')) {
+          const [arrayPath, fieldName] = field.split('[*].');
+          
+          if (cleanedData[arrayPath] && Array.isArray(cleanedData[arrayPath])) {
+            cleanedData[arrayPath].forEach((item: any, index: number) => {
+              // If field exists but is empty and we have a valid URL from our map, use that
+              if (item[fieldName] === '' || (item[fieldName] && item[fieldName].startsWith('blob:'))) {
+                // Try to find a matching URL in our uploads map
+                const fullPath = `${arrayPath}[${index}].${fieldName}`;
+                if (uploadedUrls.has(fullPath)) {
+                  console.log(`Setting array item ${fullPath} to ${uploadedUrls.get(fullPath)}`);
+                  item[fieldName] = uploadedUrls.get(fullPath);
+                }
+              }
+            });
+          }
+        }
+      });
+      
+      // Directly check image fields we know about
+      imageFields.forEach(field => {
+        if (!field.includes('[*].')) {
+          const currentValue = get(cleanedData, field);
+          
+          // If the field is empty or still has a blob URL, try to replace it
+          if (!currentValue || currentValue === '' || (typeof currentValue === 'string' && currentValue.startsWith('blob:'))) {
+            if (uploadedUrls.has(field)) {
+              console.log(`Directly setting ${field} to ${uploadedUrls.get(field)}`);
+              set(cleanedData, field, uploadedUrls.get(field));
+            }
+          }
+        }
+      });
+      
+      // Log the cleaned data for debugging
+      console.log('Cleaned data ready for submission:', cleanedData);
       
       // Get the GitHub access token from the session
       const userToken = (session as any)?.accessToken;
@@ -261,7 +636,7 @@ export function DynamicForm({ formId, siteId }: DynamicFormProps) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
-          content: JSON.stringify(data, null, 2),
+          content: JSON.stringify(cleanedData, null, 2),
           userToken: userToken
         }),
       });
@@ -305,7 +680,7 @@ export function DynamicForm({ formId, siteId }: DynamicFormProps) {
         body: JSON.stringify({ 
           gistRawUrl, 
           subdomain,
-          repoName: formData.repo_name.repo
+          repoName: cleanedData.repo_name.repo
         }),
       });
 
@@ -315,6 +690,10 @@ export function DynamicForm({ formId, siteId }: DynamicFormProps) {
       
       // After successful submission, clear the session storage
       clearSessionStorage();
+      
+      // Clean up global variable
+      delete window.__UPLOADED_CLOUDINARY_URLS;
+      
       setLoading(false);
       
       // Reset payment complete state after 5 seconds
@@ -361,33 +740,6 @@ export function DynamicForm({ formId, siteId }: DynamicFormProps) {
   const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
   const handleStepClick = (step: number) => setCurrentStep(step);
   
-  // Handle image upload
-  const handleImageUpload = (fieldPath: string) => (result: CloudinaryUploadWidgetResults) => {
-    if (result.event !== 'success') return;
-    
-    const info = result.info as { secure_url: string };
-    
-    setFormData(prev => {
-      const newFormData = cloneDeep(prev);
-      set(newFormData, fieldPath, info.secure_url);
-      return newFormData;
-    });
-  };
-  
-  // Handle array image upload
-  const handleArrayImageUpload = (arrayName: string, index: number, fieldName: string) => (result: CloudinaryUploadWidgetResults) => {
-    if (result.event !== 'success') return;
-    
-    const info = result.info as { secure_url: string };
-    
-    setFormData(prev => {
-      const newFormData = cloneDeep(prev);
-      const fullPath = `${arrayName}[${index}].${fieldName}`;
-      set(newFormData, fullPath, info.secure_url);
-      return newFormData;
-    });
-  };
-  
   // Get value from nested object
   const getValue = (obj: DynamicObject, path: string): string => {
     return get(obj, path, '');
@@ -396,39 +748,39 @@ export function DynamicForm({ formId, siteId }: DynamicFormProps) {
   // Image upload field
   const ImageUploadField = ({ fieldName, label }: { fieldName: string; label: string }) => {
     const value = getValue(formData, fieldName);
+    const fileInputRef = React.useRef<HTMLInputElement>(null);
     
     return (
       <div className="mb-4">
         <label className="block text-sm font-medium mb-1">{label}</label>
         <div className="flex items-center gap-2">
-          <CldUploadWidget
-            options={{ 
-              cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-              uploadPreset: 'my_uploads'
-            }}
-            onSuccess={handleImageUpload(fieldName)}
+          <input
+            type="file"
+            ref={fileInputRef}
+            accept="image/*"
+            onChange={handleImageSelection(fieldName)}
+            className="hidden"
+          />
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
+            aria-label={`Upload ${label}`}
           >
-            {({ open }) => (
-              <button
-                type="button"
-                onClick={() => open()}
-                className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
-                aria-label={`Upload ${label}`}
-              >
-                Upload Image
-              </button>
-            )}
-          </CldUploadWidget>
+            Select Image
+          </button>
           {value && (
             <div className="relative w-16 h-16 border rounded overflow-hidden">
               <img src={value} alt={label} className="w-full h-full object-cover" />
             </div>
           )}
         </div>
+        {uploadError && <p className="text-red-500 text-sm mt-1">{uploadError}</p>}
+        <p className="text-gray-500 text-sm mt-1">Maximum file size: 1.5MB</p>
         {value && (
           <input 
             type="text" 
-            value={value} 
+            value={tempFiles.some(f => f.path === fieldName) ? "Image selected (will be uploaded on submission)" : value} 
             readOnly 
             className="mt-1 w-full border-gray-300 rounded-md shadow-sm p-2 text-xs"
             aria-label={`${label} URL`}
@@ -440,40 +792,41 @@ export function DynamicForm({ formId, siteId }: DynamicFormProps) {
   
   // Array image upload field
   const ArrayImageUploadField = ({ arrayName, index, fieldName, label }: { arrayName: string; index: number; fieldName: string; label: string }) => {
-    const value = getValue(formData, `${arrayName}[${index}].${fieldName}`);
+    const path = `${arrayName}[${index}].${fieldName}`;
+    const value = getValue(formData, path);
+    const fileInputRef = React.useRef<HTMLInputElement>(null);
     
     return (
       <div className="mb-4">
         <label className="block text-sm font-medium mb-1">{label}</label>
         <div className="flex items-center gap-2">
-          <CldUploadWidget
-            options={{ 
-              cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-              uploadPreset: 'my_uploads'
-            }}
-            onSuccess={handleArrayImageUpload(arrayName, index, fieldName)}
+          <input
+            type="file"
+            ref={fileInputRef}
+            accept="image/*"
+            onChange={handleArrayImageSelection(arrayName, index, fieldName)}
+            className="hidden"
+          />
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
+            aria-label={`Upload ${label} for item ${index + 1}`}
           >
-            {({ open }) => (
-              <button
-                type="button"
-                onClick={() => open()}
-                className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
-                aria-label={`Upload ${label} for item ${index + 1}`}
-              >
-                Upload Image
-              </button>
-            )}
-          </CldUploadWidget>
+            Select Image
+          </button>
           {value && (
             <div className="relative w-16 h-16 border rounded overflow-hidden">
               <img src={value} alt={label} className="w-full h-full object-cover" />
             </div>
           )}
         </div>
+        {uploadError && <p className="text-red-500 text-sm mt-1">{uploadError}</p>}
+        <p className="text-gray-500 text-sm mt-1">Maximum file size: 1.5MB</p>
         {value && (
           <input 
             type="text" 
-            value={value} 
+            value={tempFiles.some(f => f.path === path) ? "Image selected (will be uploaded on submission)" : value} 
             readOnly 
             className="mt-1 w-full border-gray-300 rounded-md shadow-sm p-2 text-xs"
             aria-label={`${label} URL for item ${index + 1}`}
@@ -672,6 +1025,36 @@ export function DynamicForm({ formId, siteId }: DynamicFormProps) {
         )}
       </div>
     );
+  };
+  
+  // These functions are now used with CldUploadWidget if still needed
+  const handleImageUpload = (fieldPath: string) => (result: CloudinaryUploadWidgetResults) => {
+    if (result.event !== 'success') return;
+    
+    const info = result.info as { secure_url: string };
+    console.log(`Cloudinary direct upload for ${fieldPath}: ${info.secure_url}`);
+    
+    // No need to store in tempFiles since it's already in Cloudinary
+    setFormData(prev => {
+      const newFormData = cloneDeep(prev);
+      set(newFormData, fieldPath, info.secure_url);
+      return newFormData;
+    });
+  };
+  
+  const handleArrayImageUpload = (arrayName: string, index: number, fieldName: string) => (result: CloudinaryUploadWidgetResults) => {
+    if (result.event !== 'success') return;
+    
+    const info = result.info as { secure_url: string };
+    const path = `${arrayName}[${index}].${fieldName}`;
+    console.log(`Cloudinary direct upload for ${path}: ${info.secure_url}`);
+    
+    // No need to store in tempFiles since it's already in Cloudinary
+    setFormData(prev => {
+      const newFormData = cloneDeep(prev);
+      set(newFormData, path, info.secure_url);
+      return newFormData;
+    });
   };
   
   return (
